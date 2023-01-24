@@ -2,12 +2,55 @@ import { FormLabel, TextField, Button } from "@mui/material";
 import { useState } from "react";
 import { BtnStyle, BtnStyleSmall } from "./Shared";
 import React from "react";
+import { useEffect } from "react";
 
 export const NewCampaign = () => {
   const [tweetBody, setTweetBody] = useState("");
   const [hashtag, setHashtag] = useState("");
   const [link, setLink] = useState("");
 
+  const [shortLink, setShortLink] = useState("");
+  const [uuid, setUuid] = useState('');
+
+
+  const [links, setLinks] = useState();
+
+  const API = 'https://python-shortlinkr.onrender.com/'
+
+  const getLinks = async () => {
+    const links = await fetch(API + "all_links");
+    const data = await links.json();
+    setLinks(data)
+    setUuid(data.length + "-" + Math.floor(Math.random() * 1000));
+  }
+
+  useEffect(() => {
+    getLinks()
+  }, [])
+
+  const createLink = async (short, long) => {
+    console.log('creating: ', short, long)
+
+    if (links.filter((datum) => datum.short == short).length == 0) {
+      try {
+        const link = await fetch(
+          `${API}createlink?short=${short}&long=${long}`
+        );
+        const data = await link.json();
+        console.log(data);
+        setShortLink(window.location.host + "/" + data.short);
+      } catch {
+        console.log("something has gone wrong");
+      }
+    } else {
+      return "Shortlink already in use";
+    }
+  };
+
+
+  console.log(uuid);
+
+  const newShortUrl = uuid
   return (
     <div
       className="landingContainer"
@@ -65,11 +108,17 @@ export const NewCampaign = () => {
           sx={BtnStyle}
           onClick={() => {
             setLink(
-             (window.location.origin +
-                "/" +
+              "/" +
                 encodeURIComponent(hashtag.replace("#", "")) +
                 "/" +
-                encodeURIComponent(tweetBody))
+                encodeURIComponent(tweetBody)
+            );
+            createLink(
+              uuid,
+              "/" +
+                encodeURIComponent(hashtag.replace("#", "")) +
+                "/" +
+                encodeURIComponent(tweetBody)
             );
           }}
         >
@@ -85,7 +134,7 @@ export const NewCampaign = () => {
             className="notFlash"
             fullWidth
             id="link"
-            defaultValue={link}
+            value={shortLink}
             InputProps={{
               style: {
                 backgroundColor: "white",
@@ -95,7 +144,7 @@ export const NewCampaign = () => {
           <center>
             <Button
               onClick={() => {
-                navigator.clipboard.writeText(link);
+                navigator.clipboard.writeText(shortLink);
               }}
               sx={BtnStyleSmall}
             >
