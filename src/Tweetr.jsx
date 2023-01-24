@@ -5,31 +5,42 @@ import { useState } from "react";
 import { handles } from "./HANDLES";
 import { BtnStyle, BtnStyleSmall } from "./Shared";
 
+import {useParams} from 'react-router-dom'
+
 //accordion imports
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { msps } from "./MSPS";
 
 export const Tweetr = ({
-  msp,
+  mspProp,
   constMSPs,
   constituency,
   region,
   setConstituency,
 }) => {
-  console.log(constMSPs);
+
+  const params = useParams();
+  console.log(params)
+
+  const hashtag = '#' + (params.hashtag || 'RentControlsNow')
+  const template = params.template || "will  you stand with tenants?"
+
+
 
   const [mspHandle, setMspHandle] = useState("");
   const [tweetBody, setTweetBody] = useState("");
+  const [msp, setMsp] = useState(mspProp);
 
   useEffect(() => {
-    setMspHandle(handles.filter((hand) => hand.msp == msp)[0].handle);
+    setMspHandle(handles.filter((hand) => hand.msp == msp.msp)[0].handle);
   }, [msp, constMSPs]);
 
   useEffect(() => {
     setTweetBody(
-      `Hi ${mspHandle}, will you support this great campaign?\n\n#RentControlsNow`
+      `Hi ${mspHandle}, ` + template
     );
   }, [mspHandle]);
 
@@ -59,6 +70,10 @@ export const Tweetr = ({
       <br />
       {mspHandle !== "none" ? (
         <>
+          <span>
+            You're tweeting: <b>{msp.msp}, {msp.party}</b>
+          </span>
+          <br/><br/>
           <FormLabel sx={{ color: "white" }}>Your tweet</FormLabel>
           <br />
           <TextField
@@ -69,6 +84,7 @@ export const Tweetr = ({
             multiline
             minRows={3}
             defaultValue={tweetBody}
+            inputProps={{ maxLength: 280-(hashtag.length+2) }}
             onChange={(e) => setTweetBody(e.target.value)}
             InputProps={{
               style: {
@@ -76,6 +92,26 @@ export const Tweetr = ({
               },
             }}
           />
+          <TextField
+          disabled
+          className="notFlash"
+            fullWidth
+            id="hashtag"
+            defaultValue={hashtag}
+            InputProps={{
+              style: {
+                backgroundColor: "white",
+              },
+            }}
+          />
+          <div
+            style={{
+              textAlign: "right",
+              color: `rgb(${255}, ${255-(((tweetBody.length+hashtag.length)-250)*10)}, ${255-(((tweetBody.length+hashtag.length)-250)*10)})`
+            }}
+          >
+            {tweetBody.length+hashtag.length+2}/280
+          </div>
         </>
       ) : (
         <>It looks like this MSP isn't on Twitter.</>
@@ -86,7 +122,7 @@ export const Tweetr = ({
         <Button
           sx={BtnStyle}
           target="_blank"
-          href={`https://twitter.com/intent/tweet?text=${tweetBody
+          href={`https://twitter.com/intent/tweet?text=${(tweetBody+' '+hashtag)
             .replace("#", "%23")
             .replace(/\n/g, "%0A")}`}
         >
@@ -133,11 +169,7 @@ export const Tweetr = ({
                       sx={BtnStyleSmall}
                       onClick={() => {
                         handles.filter((hand) => hand.msp == filtMsp.msp)[0]
-                          .handle !== "none" &&
-                          setMspHandle(
-                            handles.filter((hand) => hand.msp == filtMsp.msp)[0]
-                              .handle
-                          );
+                          .handle !== "none" && setMsp(filtMsp);
                         refresh();
                       }}
                     >

@@ -16,13 +16,22 @@ export const PostCode = () => {
   const [region, setRegion] = useState(null);
   const [constMSPs, setConstMSPs] = useState([]);
 
+  const [invalid, setInvalid] = useState(false)
+
   const fetchPostcodeDeets = async () => {
+
+    try {
     const response = await fetch(
       `https://api.postcodes.io/scotland/postcodes/${postcode}`
     );
 
     const data = await response.json();
-    setConstituency(data.result.scottish_parliamentary_constituency);
+    invalid && setInvalid(false)
+    setConstituency(data.result.scottish_parliamentary_constituency); }
+    catch {
+      setInvalid(true)
+      console.log('invalid postcode')
+    }
   };
 
   useEffect(() => {
@@ -66,8 +75,9 @@ export const PostCode = () => {
               <br />
               <br />
               <TextField
+              autoFocus
                 id="postcodeInput"
-                sx={{ width: "75%" }}
+                sx={{ width: "75%", border: invalid && 'red 2px solid', borderRadius: invalid && '5px' }}
                 defaultValue={postcode}
                 onChange={(e) => setPostcode(e.target.value)}
                 InputProps={{
@@ -76,7 +86,7 @@ export const PostCode = () => {
                   },
                 }}
               />
-
+{invalid && <h5>This postcode doesn't seem to be valid! Try again</h5>}
               <br />
               <br />
               <Button sx={BtnStyle} onClick={() => fetchPostcodeDeets()}>
@@ -103,8 +113,8 @@ export const PostCode = () => {
               region={region}
               setConstituency={() => setConstituency(null)}
               constMSPs={constMSPs}
-              msp={
-                msps.filter((msp) => msp.constituency == constituency)[0].msp
+              mspProp={
+                msps.filter((msp) => msp.constituency == constituency)[0]
               }
             />
           </div>
