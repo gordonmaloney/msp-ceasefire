@@ -7,7 +7,12 @@ import { msps } from "./MSPS";
 import { handles } from "./HANDLES";
 import { BtnStyle, BtnStyleSmall } from "./Shared";
 
+import { useParams } from "react-router-dom";
+
 export const PostCode = () => {
+  const params = useParams();
+  const { target } = params;
+
   const [postcode, setPostcode] = useState(null);
 
   const [gotPostcode, setGotPostcode] = useState(false);
@@ -16,21 +21,20 @@ export const PostCode = () => {
   const [region, setRegion] = useState(null);
   const [constMSPs, setConstMSPs] = useState([]);
 
-  const [invalid, setInvalid] = useState(false)
+  const [invalid, setInvalid] = useState(false);
 
   const fetchPostcodeDeets = async () => {
-
     try {
-    const response = await fetch(
-      `https://api.postcodes.io/scotland/postcodes/${postcode}`
-    );
+      const response = await fetch(
+        `https://api.postcodes.io/scotland/postcodes/${postcode}`
+      );
 
-    const data = await response.json();
-    invalid && setInvalid(false)
-    setConstituency(data.result.scottish_parliamentary_constituency); }
-    catch {
-      setInvalid(true)
-      console.log('invalid postcode')
+      const data = await response.json();
+      invalid && setInvalid(false);
+      setConstituency(data.result.scottish_parliamentary_constituency);
+    } catch {
+      setInvalid(true);
+      console.log("invalid postcode");
     }
   };
 
@@ -52,19 +56,11 @@ export const PostCode = () => {
   }, [region]);
 
   return (
-    <div>
-      {!constituency ? (
+    <>
+    <div className="landing" >
+      {!constituency && (!target || target == "msps") ? (
         <>
-          <div
-            className="landingContainer"
-            style={{
-              width: "60%",
-              minWidth: "250px",
-              marginLeft: "auto",
-              marginRight: "auto",
-              marginTop: '25vh'
-            }}
-          >
+          <div className="landingContainerSmall" >
             <span className="bebas header header2">Tweet your MSP</span>
             <br />
             <br />
@@ -75,9 +71,13 @@ export const PostCode = () => {
               <br />
               <br />
               <TextField
-              autoFocus
+                autoFocus
                 id="postcodeInput"
-                sx={{ width: "75%", border: invalid && 'red 2px solid', borderRadius: invalid && '5px' }}
+                sx={{
+                  width: "75%",
+                  border: invalid && "red 2px solid",
+                  borderRadius: invalid && "5px",
+                }}
                 defaultValue={postcode}
                 onChange={(e) => setPostcode(e.target.value)}
                 InputProps={{
@@ -86,7 +86,9 @@ export const PostCode = () => {
                   },
                 }}
               />
-{invalid && <h5>This postcode doesn't seem to be valid! Try again</h5>}
+              {invalid && (
+                <h5>This postcode doesn't seem to be valid! Try again</h5>
+              )}
               <br />
               <br />
               <Button sx={BtnStyle} onClick={() => fetchPostcodeDeets()}>
@@ -97,17 +99,7 @@ export const PostCode = () => {
         </>
       ) : (
         <>
-          <div
-            className="landingContainer"
-            style={{
-              marginTop: "20px",
-              width: "60%",
-              minWidth: "240px",
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
-          >
-   
+          <div className="landingContainer" >
             <Tweetr
               constituency={constituency}
               region={region}
@@ -121,5 +113,8 @@ export const PostCode = () => {
         </>
       )}
     </div>
+    
+    <br/><br/>
+    </>
   );
 };
