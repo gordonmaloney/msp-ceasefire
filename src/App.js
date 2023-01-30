@@ -5,6 +5,7 @@ import { Header } from "./Header";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { Shortlinker } from "./Shortlinker";
 import { Redirector } from "./Redirector";
+import { EmailCampaign } from "./EmailCampaign";
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
 
           <Route path="/:target/:hashtag/:template" element={<PostCode />} />
           <Route path="/newcampaign" element={<NewCampaign />} />
+
+          <Route path="email" element={<EmailCampaign />} />
         </Routes>
       </BrowserRouter>
     </>
