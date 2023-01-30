@@ -14,15 +14,15 @@ export const Header = () => {
   return (
     <div className="navBar">
       <Link to="../">
-        <h2 className="bebas" style={{ margin: 0, paddingLeft: "20px" }}>
-          Tweeter
-        </h2>
+        <span className="bebas header3 header" style={{ margin: 0, paddingLeft: "20px" }}>
+          TenantShout
+        </span>
       </Link>
 
       <a href="https://www.livingrent.org" target="_blank">
-        <h3 className="bebas" style={{ margin: 0, paddingRight: "20px" }}>
+        <span className="bebas header3 header" style={{ margin: 0, paddingRight: "20px" }}>
           Living Rent
-        </h3>
+        </span>
       </a>
     </div>
   );

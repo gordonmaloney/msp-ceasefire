@@ -2,7 +2,7 @@ import { Button, FormLabel, Grid } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { useEffect } from "react";
 import { useState } from "react";
-import { handles } from "./HANDLES";
+import { handles } from "./Data/HANDLES";
 import { BtnStyle, BtnStyleSmall } from "./Shared";
 
 import { useParams } from "react-router-dom";
@@ -12,9 +12,10 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { msps } from "./MSPS";
+import { msps } from "./Data/MSPS";
 
 export const Tweetr = ({
+  campaign,
   mspProp,
   constMSPs,
   constituency,
@@ -23,10 +24,10 @@ export const Tweetr = ({
 }) => {
   const params = useParams();
 
-  const hashtag = "#" + (params.hashtag || "RentControlsNow");
-  const template = params.template || "what are you doing for tenants? ";
+  const hashtag = "#" + (campaign?.hashtag || "RentControlsNow");
+  const template = campaign?.template || "what are you doing for tenants? ";
 
-  const { target } = params;
+  const target = campaign?.target;
 
   const [mspHandle, setMspHandle] = useState("");
   const [tweetBody, setTweetBody] = useState("");
@@ -159,81 +160,83 @@ export const Tweetr = ({
       </center>
       <br />
       <br />
-      <div style={{ marginLeft: "10px" }}>
-        <Accordion
-          className="otherMSPs"
-          sx={{ backgroundColor: "rgba(255,255,255,0.9)" }}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="details"
-            sx={{ padding: "0px" }}
+      {(!target || target == "msps") && (
+        <div style={{ marginLeft: "10px" }}>
+          <Accordion
+            className="otherMSPs"
+            sx={{ backgroundColor: "rgba(255,255,255,0.9)" }}
           >
-            <div
-              className="bebas header3 header"
-              style={{ color: "black", marginLeft: "10px" }}
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="details"
+              sx={{ padding: "0px" }}
             >
-              Your other MSPs:
-            </div>{" "}
-          </AccordionSummary>
-          <AccordionDetails sx={{ paddingTop: "-20px", paddingX: "10px" }}>
-            <p>
-              Each area in Scotland is represented by multiple MSPs. One for the
-              constituency, and several for the list. By default, this tool
-              targets your constituency MSP, but you can choose to tweet a
-              different one by selecting them from the list:
-              <br />
-              <br />
-              <Grid
-                container
-                spacing={2}
-                sx={{ justifyContent: "space-around" }}
+              <div
+                className="bebas header3 header"
+                style={{ color: "black", marginLeft: "10px" }}
               >
-                {constMSPs.map((filtMsp) => (
-                  <Grid
-                    item
-                    sx={{ width: "120px", cursor: 'pointer' }}
-                    onClick={() => {
-                      handles.filter((hand) => hand.msp == filtMsp.msp)[0]
-                        .handle !== "none" && setMsp(filtMsp);
-                      refresh();
-                    }}
-                  >
-                    <b>{filtMsp.msp}</b>
-                    <br />
-                    {filtMsp.party}
-                    <br />
-                    {handles.filter((hand) => hand.msp == filtMsp.msp)[0]
-                      .handle !== "none" ? (
-                      <Button
-                        sx={{
-                          ...BtnStyleSmall,
-                          fontSize: "small",
-                          paddingX: "4px",
-                          paddingTop: "2px",
-                        }}
-                        onClick={() => {
-                          handles.filter((hand) => hand.msp == filtMsp.msp)[0]
-                            .handle !== "none" && setMsp(filtMsp);
-                          refresh();
-                        }}
-                      >
-                        {
-                          handles.filter((hand) => hand.msp == filtMsp.msp)[0]
-                            .handle
-                        }
-                      </Button>
-                    ) : (
-                      "It looks like this MSP is not on twitter"
-                    )}
-                  </Grid>
-                ))}
-              </Grid>
-            </p>
-          </AccordionDetails>
-        </Accordion>
-      </div>
+                Your other MSPs:
+              </div>{" "}
+            </AccordionSummary>
+            <AccordionDetails sx={{ paddingTop: "-20px", paddingX: "10px" }}>
+              <p>
+                Each area in Scotland is represented by multiple MSPs. One for
+                the constituency, and several for the list. By default, this
+                tool targets your constituency MSP, but you can choose to tweet
+                a different one by selecting them from the list:
+                <br />
+                <br />
+                <Grid
+                  container
+                  spacing={2}
+                  sx={{ justifyContent: "space-around" }}
+                >
+                  {constMSPs.map((filtMsp) => (
+                    <Grid
+                      item
+                      sx={{ width: "120px", cursor: "pointer" }}
+                      onClick={() => {
+                        handles.filter((hand) => hand.msp == filtMsp.msp)[0]
+                          .handle !== "none" && setMsp(filtMsp);
+                        refresh();
+                      }}
+                    >
+                      <b>{filtMsp.msp}</b>
+                      <br />
+                      {filtMsp.party}
+                      <br />
+                      {handles.filter((hand) => hand.msp == filtMsp.msp)[0]
+                        .handle !== "none" ? (
+                        <Button
+                          sx={{
+                            ...BtnStyleSmall,
+                            fontSize: "small",
+                            paddingX: "4px",
+                            paddingTop: "2px",
+                          }}
+                          onClick={() => {
+                            handles.filter((hand) => hand.msp == filtMsp.msp)[0]
+                              .handle !== "none" && setMsp(filtMsp);
+                            refresh();
+                          }}
+                        >
+                          {
+                            handles.filter((hand) => hand.msp == filtMsp.msp)[0]
+                              .handle
+                          }
+                        </Button>
+                      ) : (
+                        "It looks like this MSP is not on twitter"
+                      )}
+                    </Grid>
+                  ))}
+                </Grid>
+              </p>
+            </AccordionDetails>
+          </Accordion>
+        </div>
+      )}
     </div>
   );
 };

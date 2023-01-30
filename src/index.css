@@ -16,7 +16,7 @@ body {
 }
 
 .header {
-  font-weight: 600;
+  font-weight: 500;
   line-height: 0.95em;
   color: white;
 }
@@ -132,6 +132,27 @@ a {
 
 .showOnMob {
   visibility: hidden;
+}
+
+.vanishLeft {
+  margin-right: 140vw;
+  opacity: 0;
+  transition: 0.5s;
+}
+
+.vanishRight {
+  margin-left: 140vw;
+  opacity: 0;
+  transition: 0.5s;
+}
+
+.fadeIn {
+  opacity: 0;
+  transition: 0.3s;
+}
+.fadeFinished {
+  opacity: 1;
+  transition: 0.3s
 }
 
 .scrollBtn {

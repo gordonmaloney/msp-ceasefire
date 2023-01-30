@@ -3,29 +3,28 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Navigate, useParams } from "react-router";
 import { useNavigate } from "react-router";
-import {API} from './API'
+import axios from "axios";
+import { PostCode } from "./PostCode";
 
 export const Redirector = () => {
-  const navigate = useNavigate();
   const params = useParams();
-  const campaign = params.campaign;
+  const campaignName = params.campaign;
 
+  const [campaign, setCampaign] = useState({});
 
+  const getCampaign = async () => {
+    const campaign = await axios.get(
+      "http://localhost:8000/api/campaigns/" + campaignName
+    );
+    setCampaign(campaign.data);
+  };
   useEffect(() => {
-    const getLink = async (campaign) => {
-      try {
-        const link = await fetch(
-          `${API}link?campaign=${campaign}`
-        );
-        const data = await link.json();
-
-        navigate(`../${data.long}`)
-      } catch {
-        console.log("uhhh");
-      }
-    };
-    getLink(campaign);
+    getCampaign();
   }, []);
 
-
+  if (campaign) {
+    return <PostCode campaign={campaign} />;
+  } else {
+    return <>Loading...</>;
+  }
 };

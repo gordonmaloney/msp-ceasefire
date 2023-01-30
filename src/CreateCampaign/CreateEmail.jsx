@@ -1,0 +1,292 @@
+import {
+  FormLabel,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  Paper,
+} from "@mui/material";
+import { useState } from "react";
+import { BtnStyle, BtnStyleSmall } from "../Shared";
+import React from "react";
+import { useEffect } from "react";
+import { Tooltip } from "@mui/material";
+import HelpCenterIcon from "@mui/icons-material/HelpCenter";
+import { API } from "../API";
+import axios from "axios";
+
+export const CreateEmail = () => {
+  const [emailBody, setEmailBody] = useState("");
+  const [target, setTarget] = useState("msps");
+  const [customTarget, setCustomTarget] = useState("");
+  const [link, setLink] = useState("");
+
+  const [name, setName] = useState("");
+  const [shortLink, setShortLink] = useState("");
+const [subject, setSubject] = useState('')
+  const [links, setLinks] = useState();
+
+
+  const getCampaigns = async () => {
+    const campaigns = await fetch("http://localhost:8000/api/campaigns/all");
+    const campaignsData = await campaigns.json();
+    console.log(campaignsData);
+    setLinks(campaignsData)
+  };
+  useEffect(() => {
+    getCampaigns();
+  }, []);
+
+
+
+  const postLink = async () => {
+    const body = {
+      name: name.replace(' ', '-'),
+      target: target !== "custom" ? target : customTarget,
+      channel: "email",
+      hashtag: 'none',
+      template: emailBody,
+      subject
+    };
+    const response = await axios.post("http://localhost:8000/api/campaigns", body)
+
+    setLink(window.location.host + "/campaign/" + response.data.name);
+    setShortLink(window.location.host + "/campaign/" + response.data.name);
+};
+
+console.log('link: ', link)
+  return (
+    <div className="landing">
+      <div className="landingContainer">
+        <span className="bebas header header2">Create an email campaign</span>
+
+        <br />
+
+        <FormLabel sx={{ color: "white" }}>
+          <Tooltip
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: "green",
+                  "& .MuiTooltip-arrow": {
+                    color: "green",
+                  },
+                },
+              },
+            }}
+            placement="right"
+            arrow
+            title="Draft your subject line here"
+          >
+            <HelpCenterIcon sx={{ marginBottom: "-6px" }} />
+          </Tooltip>
+          Subject{" "}
+        </FormLabel>
+        <br />
+        <TextField
+          className={"notFlash"}
+          fullWidth
+          required
+          id="user-subject"
+          value={subject}
+          onChange={(e) => {
+            setSubject(`${e.target.value}`);
+          }}
+          InputProps={{
+            style: {
+              backgroundColor: "white",
+            },}}
+        />
+        <br/>
+        <FormLabel sx={{ color: "white" }}>
+          <Tooltip
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: "green",
+                  "& .MuiTooltip-arrow": {
+                    color: "green",
+                  },
+                },
+              },
+            }}
+            placement="right"
+            arrow
+            title="Draft your email here."
+          >
+            <HelpCenterIcon sx={{ marginBottom: "-6px" }} />
+          </Tooltip>
+          Template Email{" "}
+        </FormLabel>
+        <br />
+        <TextField
+          className={"notFlash"}
+          fullWidth
+          required
+          id="user-email"
+          multiline
+          minRows={3}
+          value={emailBody}
+          onChange={(e) => {
+            setEmailBody(`${e.target.value}`);
+          }}
+          InputProps={{
+            style: {
+              backgroundColor: "white",
+            },}}
+        />
+
+
+        <br />
+        <FormLabel sx={{ color: "white" }}>
+          <Tooltip
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: "green",
+                  "& .MuiTooltip-arrow": {
+                    color: "green",
+                  },
+                },
+              },
+            }}
+            sx={{ backgroundColor: "green" }}
+            placement="right"
+            arrow
+            title="Choose your target (if you want one!). If you pick MSPs, it will filter by postcode so users only message their own MSPs."
+          >
+            <HelpCenterIcon sx={{ marginBottom: "-6px" }} />
+          </Tooltip>
+          Pick a target
+        </FormLabel>
+        <br />
+        <Select
+          value={target}
+          className="notFlash"
+          onChange={(e) => setTarget(e.target.value)}
+          sx={{
+            backgroundColor: "white",
+            marginTop: "3px",
+            marginBottom: "5px",
+            marginLeft: "5px",
+
+            width: target == "custom" ? "40px" : "100px",
+            color: target == "custom" ? "transparent" : "black",
+            transition: "0s !important",
+
+            "& .MuiInputBase-input": {
+              padding: "11.5px",
+              paddingLeft: "10px",
+              paddingRight: "0",
+            },
+          }}
+        >
+          <MenuItem value="msps">MSPs</MenuItem>
+          <MenuItem value="custom">Custom</MenuItem>
+        </Select>
+
+        {target == "custom" && (
+          <>
+            {" "}
+            <TextField
+              id="customTarget"
+              value={customTarget}
+              onChange={(e) =>
+                setCustomTarget(
+                  `${e.target.value}`
+                )
+              }
+              sx={{ marginTop: "3px", width: "230px" }}
+              InputProps={{
+                style: {
+                  backgroundColor: "white",
+                  maxWidth: "230px",
+                },
+              }}
+            ></TextField>
+          </>
+        )}
+
+        <br />
+
+        <FormLabel sx={{ color: "white" }}>
+          <Tooltip
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: "green",
+                  "& .MuiTooltip-arrow": {
+                    color: "green",
+                  },
+                },
+              },
+            }}
+            placement="right"
+            arrow
+            title="Your campaign name will appear in the shareable shortlink."
+          >
+            <HelpCenterIcon sx={{ marginBottom: "-6px" }} />
+          </Tooltip>
+          Name your campaign
+        </FormLabel>
+        <br />
+        <TextField
+          className="notFlash"
+          fullWidth
+          id="campaignName"
+          value={name}
+          InputProps={{
+            style: {
+              backgroundColor: "white",
+            },
+          }}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <br />
+        <br />
+
+        <center>
+          <Button
+            sx={BtnStyle}
+            onClick={postLink}
+          >
+            Generate link
+          </Button>
+          <br />
+          <br />
+         
+        </center>
+
+        {link && (
+          <>
+            <br />
+
+            <TextField
+              fullWidth
+              className="notFlash"
+              id="link"
+              value={shortLink}
+              InputProps={{
+                style: {
+                  backgroundColor: "white",
+                },
+              }}
+            />
+
+            <center>
+              <Button
+                onClick={() => {
+                  navigator.clipboard.writeText(shortLink);
+                }}
+                sx={BtnStyleSmall}
+              >
+                Copy
+              </Button>
+            </center>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};

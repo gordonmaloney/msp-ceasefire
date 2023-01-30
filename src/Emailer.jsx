@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useState } from "react";
-import { handles } from "./HANDLES";
+import { handles } from "./Data/HANDLES";
 import { Chip, Paper } from "@mui/material";
-import { msps } from "./MSPS";
+import { msps } from "./Data/MSPS";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { Checkbox, FormLabel, Grid, TextField, Button } from "@mui/material";
@@ -15,6 +15,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export const Emailer = ({
+  campaign,
   mspProp,
   constMSPs,
   constituency,
@@ -36,11 +37,17 @@ export const Emailer = ({
     }, 500);
   };
 
+  console.log(campaign);
   useEffect(() => {
-    setSubject("Will you stand with tenants?");
-    setBody(
-      "Hi there,\n\nI am writing as one of your constituents to ask that you....XYZ"
-    );
+    if (campaign) {
+      setSubject(campaign.subject);
+      setBody(campaign.template);
+    } else {
+      setSubject("Will you stand with tenants?");
+      setBody(
+        "Hi there,\n\nI am writing as one of your constituents to ask that you stand with tenants."
+      );
+    }
   }, [constMSPs]);
 
   useEffect(() => {
@@ -52,7 +59,7 @@ export const Emailer = ({
       <span className="bebas header header2">Draft your email</span>
       <br />
       <br />
-      {constMSPs.length > 1 && (
+      {campaign?.target == "msps" && constMSPs.length > 1 && (
         <>
           Everyone in Scotland has multiple MSPs. By default, this tool allows
           you to email them all. But if you'd like, you can choose which of your
@@ -73,13 +80,13 @@ export const Emailer = ({
           <br /> <br />
           <FormLabel sx={{ marginLeft: "2.5%", color: "white" }}>To:</FormLabel>
           <Paper
-            sx={{ width: "93%", margin: "1px 2.5% 7px 2.5%", padding: "5px" }}
+            sx={{
+              width: "93%",
+              margin: "1px 2.5% 7px 2.5%",
+              padding: "5px",
+              paddingY: "15px",
+            }}
           >
-            {emailing.length == 0 && (
-              <div style={{ color: "red", marginLeft: "10px" }}>
-                You need to pick at least one recipient!
-              </div>
-            )}
             {emailing.map((msp) => (
               <Chip
                 size="small"
@@ -100,6 +107,14 @@ export const Emailer = ({
                 }}
               ></Chip>
             ))}
+            {campaign?.target !== "msps" && (
+              <span style={{ marginLeft: "10px" }}>{campaign?.target}</span>
+            )}
+            {campaign?.target == "msps" && emailing.length == 0 && (
+              <div style={{ color: "red", marginLeft: "10px" }}>
+                You need to pick at least one recipient!
+              </div>
+            )}
           </Paper>
           {notEmailing.length > 0 && (
             <>
@@ -150,9 +165,10 @@ export const Emailer = ({
                     <br />
                     {notEmailing.map((msp) => (
                       <Chip
+                      size="small"
                         label={msp.msp + " - " + msp.party}
                         variant="outlined"
-                        sx={{ backgroundColor: "white", margin: "1px" }}
+                        sx={{ backgroundColor: "white", margin: "2px" }}
                         deleteIcon={
                           <AddCircleIcon style={{ fontSize: "large" }} />
                         }
@@ -253,9 +269,9 @@ export const Emailer = ({
           <Grid container justifyContent="space-around">
             {" "}
             <Button
-              href={`mailto:${emailing
-                .map((msp) => msp.email)
-                .join(",")}?subject=${subject}&bcc=${
+              href={`mailto:${(!campaign?.target || campaign?.target == "msps")? emailing
+              .map((msp) => msp.email)
+              .join(",") : campaign?.target}?subject=${subject}&bcc=${
                 optIn
                   ? "emailLobby+OptIn@livingrent.org"
                   : "emailLobby+OptOut@livingrent.org"
@@ -279,9 +295,9 @@ export const Emailer = ({
               className="hideOnMob"
               size="large"
               variant="contained"
-              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${emailing
+              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${(!campaign?.target || campaign?.target == "msps")? emailing
                 .map((msp) => msp.email)
-                .join(",")}&su=${subject}&bcc=${
+                .join(",") : campaign?.target}&su=${subject}&bcc=${
                 optIn
                   ? "emailLobby%2BOptIn@livingrent.org"
                   : "emailLobby%2BOptOut@livingrent.org"
