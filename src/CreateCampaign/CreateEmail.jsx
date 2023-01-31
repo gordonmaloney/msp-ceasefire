@@ -7,14 +7,15 @@ import {
   FormControl,
   Paper,
 } from "@mui/material";
+import { useEffect } from "react";
 import { useState } from "react";
 import { BtnStyle, BtnStyleSmall } from "../Shared";
 import React from "react";
-import { useEffect } from "react";
 import { Tooltip } from "@mui/material";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import { API } from "../API";
 import axios from "axios";
+
 
 export const CreateEmail = () => {
   const [emailBody, setEmailBody] = useState("");
@@ -27,9 +28,18 @@ export const CreateEmail = () => {
 const [subject, setSubject] = useState('')
   const [links, setLinks] = useState();
 
+    //tooltip
+    const [tooltipOpen, setTooltipOpen] = useState(false);
+    useEffect(() => {
+      if (tooltipOpen) {
+        setTimeout(() => {
+          setTooltipOpen(false);
+        }, 1000);
+      }
+    }, [tooltipOpen]);
 
   const getCampaigns = async () => {
-    const campaigns = await fetch("http://localhost:8000/api/campaigns/all");
+    const campaigns = await fetch(API + "/all");
     const campaignsData = await campaigns.json();
     console.log(campaignsData);
     setLinks(campaignsData)
@@ -49,7 +59,7 @@ const [subject, setSubject] = useState('')
       template: emailBody,
       subject
     };
-    const response = await axios.post("http://localhost:8000/api/campaigns", body)
+    const response = await axios.post(API, body)
 
     setLink(window.location.host + "/campaign/" + response.data.name);
     setShortLink(window.location.host + "/campaign/" + response.data.name);
@@ -275,14 +285,35 @@ console.log('link: ', link)
             />
 
             <center>
-              <Button
-                onClick={() => {
-                  navigator.clipboard.writeText(shortLink);
-                }}
-                sx={BtnStyleSmall}
-              >
-                Copy
-              </Button>
+            <Tooltip
+          title="copied"
+          componentsProps={{
+            tooltip: {
+              sx: {
+                bgcolor: "green",
+                "& .MuiTooltip-arrow": {
+                  color: "green",
+                },
+              },
+            },
+          }}
+          open={tooltipOpen}
+          disableFocusListener
+          disableHoverListener
+          disableTouchListener
+          placement="top"
+          arrow
+        >
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(shortLink);
+              setTooltipOpen(true);
+            }}
+            sx={{ ...BtnStyleSmall}}
+          >
+            Copy Link
+          </Button>
+        </Tooltip>
             </center>
           </>
         )}

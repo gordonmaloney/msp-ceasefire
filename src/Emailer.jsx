@@ -13,6 +13,13 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+//modal imports
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+import { ModalContent } from "./ModalContent";
+import { mobileStyle } from "./ModalContent";
+
+import axios from "axios";
 
 export const Emailer = ({
   campaign,
@@ -21,6 +28,7 @@ export const Emailer = ({
   constituency,
   region,
   setConstituency,
+  postcode,
 }) => {
   const [emailing, setEmailing] = useState([]);
   const [notEmailing, setNotEmailing] = useState([]);
@@ -29,15 +37,18 @@ export const Emailer = ({
   const [body, setBody] = useState("");
   const [signOff, setSignOff] = useState("Regards,\n");
   const [optIn, setOptIn] = useState(false);
-  const [open, setOpen] = useState(false);
 
+  const [email, setEmail] = useState("");
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const openModal = () => {
     setTimeout(() => {
       setOpen(true);
-    }, 500);
+    }, 1000);
   };
 
-  console.log(campaign);
   useEffect(() => {
     if (campaign) {
       setSubject(campaign.subject);
@@ -53,6 +64,27 @@ export const Emailer = ({
   useEffect(() => {
     setEmailing(constMSPs);
   }, [constMSPs]);
+
+  const handleOptin = async () => {
+    console.log("opting in: ", optIn);
+    if (optIn) {
+      const body = {
+        email: email,
+        msg: "I agree to Living Rent contacting me by email about this campaign and others like it.",
+        source: window.location["href"].toString(),
+        postcode: postcode,
+      };
+      console.log(body);
+
+      const response = await axios.post(
+        "http://localhost:8002/api/optin",
+        body
+      );
+      console.log(response);
+    } else {
+      console.log("not opted in");
+    }
+  };
 
   return (
     <div>
@@ -165,7 +197,7 @@ export const Emailer = ({
                     <br />
                     {notEmailing.map((msp) => (
                       <Chip
-                      size="small"
+                        size="small"
                         label={msp.msp + " - " + msp.party}
                         variant="outlined"
                         sx={{ backgroundColor: "white", margin: "2px" }}
@@ -249,6 +281,20 @@ export const Emailer = ({
             Make sure you include your address so they know you're an Edinburgh
             resident!
           </p>
+          <FormLabel sx={{ marginLeft: "2.5%", color: "white" }}>
+            Your email address:
+          </FormLabel>
+          <br />
+          <TextField
+            sx={{
+              width: "95%",
+              margin: "1px 2.5% 7px 2.5%",
+              backgroundColor: "white",
+              borderRadius: "5px",
+            }}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
           <FormGroup sx={{ width: "95%", margin: "1px 2.5% 7px 2.5%" }}>
             <FormControlLabel
               control={
@@ -267,56 +313,94 @@ export const Emailer = ({
             />
           </FormGroup>
           <Grid container justifyContent="space-around">
-            {" "}
-            <Button
-              href={`mailto:${(!campaign?.target || campaign?.target == "msps")? emailing
-              .map((msp) => msp.email)
-              .join(",") : campaign?.target}?subject=${subject}&bcc=${
-                optIn
-                  ? "emailLobby+OptIn@livingrent.org"
-                  : "emailLobby+OptOut@livingrent.org"
-              }&body=${
-                body.replace(/\n/g, "%0A") +
-                "%0A%0A" +
-                signOff.replace(/\n/g, "%0A")
-              }`}
-              //disabled={signOff == "Regards,\n"}
-              size="large"
-              variant="contained"
-              style={{ ...BtnStyleSmall, margin: 2 }}
-              onClick={() => {
-                openModal();
-              }}
-            >
-              Send your email
-            </Button>
-            <Button
-              //disabled={signOff == "Regards,\n"}
-              className="hideOnMob"
-              size="large"
-              variant="contained"
-              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${(!campaign?.target || campaign?.target == "msps")? emailing
-                .map((msp) => msp.email)
-                .join(",") : campaign?.target}&su=${subject}&bcc=${
-                optIn
-                  ? "emailLobby%2BOptIn@livingrent.org"
-                  : "emailLobby%2BOptOut@livingrent.org"
-              }&body=${
-                body.replace(/\n/g, "%0A") +
-                "%0A%0A" +
-                signOff.replace(/\n/g, "%0A")
-              }`}
-              target="_blank"
-              onClick={() => {
-                openModal();
-              }}
-              style={{ ...BtnStyleSmall, margin: 2 }}
-            >
-              Send via Gmail
-            </Button>
+            <Grid item xs={12} sm={6}>
+              <center>
+              <Button
+                href={`mailto:${
+                  !campaign?.target || campaign?.target == "msps"
+                    ? emailing.map((msp) => msp.email).join(",")
+                    : campaign?.target
+                }?subject=${subject}&bcc=${
+                  optIn
+                    ? "emailLobby+OptIn@livingrent.org"
+                    : "emailLobby+OptOut@livingrent.org"
+                }&body=${
+                  body.replace(/\n/g, "%0A") +
+                  "%0A%0A" +
+                  signOff.replace(/\n/g, "%0A")
+                }`}
+                //disabled={signOff == "Regards,\n"}
+                size="large"
+                variant="contained"
+                style={{ ...BtnStyleSmall, margin: 2 }}
+                onClick={() => {
+                  openModal();
+                  handleOptin();
+                }}
+              >
+                Send your email
+              </Button>
+              </center>
+            </Grid>
+            <Grid item sx={{display: { xs: 'none', sm: 'block' }}}>
+            <center>
+
+              <Button
+                //disabled={signOff == "Regards,\n"}
+                className="hideOnMob"
+                size="large"
+                variant="contained"
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${
+                  !campaign?.target || campaign?.target == "msps"
+                    ? emailing.map((msp) => msp.email).join(",")
+                    : campaign?.target
+                }&su=${subject}&bcc=${
+                  optIn
+                    ? "emailLobby%2BOptIn@livingrent.org"
+                    : "emailLobby%2BOptOut@livingrent.org"
+                }&body=${
+                  body.replace(/\n/g, "%0A") +
+                  "%0A%0A" +
+                  signOff.replace(/\n/g, "%0A")
+                }`}
+                target="_blank"
+                onClick={() => {
+                  openModal();
+                  handleOptin();
+                }}
+                style={{ ...BtnStyleSmall, margin: 2 }}
+              >
+                Send via Gmail
+              </Button>
+              </center>
+            </Grid>
           </Grid>
         </div>
       </Grid>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={mobileStyle}>
+          <span
+            style={{
+              float: "right",
+              marginTop: "-23px",
+              marginRight: "-20px",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            x
+          </span>
+          <ModalContent />
+        </Box>
+      </Modal>
     </div>
   );
 };

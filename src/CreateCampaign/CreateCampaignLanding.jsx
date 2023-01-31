@@ -21,6 +21,7 @@ export const CreateCampaignLanding = () => {
     }, 500);
   };
 
+
   return (
     <div className="landing" style={{ overFlowX: "hidden" }}>
       <div className={`landingContainerSmall ${vanish}`}>
@@ -29,7 +30,7 @@ export const CreateCampaignLanding = () => {
 
           <p>Use the buttons below to start building your campaign:</p>
 
-          <Grid container justifyContent={"space-between"}>
+          <Grid spacing={3} container justifyContent={"space-around"}>
             <Grid item>
               {" "}
               <Button onClick={handleTweet} sx={BtnStyle}>

@@ -13,16 +13,17 @@ import { useParams } from "react-router-dom";
 export const PostCode = ({ campaign }) => {
   const params = useParams();
 
-  console.log(params.channel)
-  const [channel, setChannel] = useState('')
+  console.log(params.channel);
+  const [channel, setChannel] = useState("");
   useEffect(() => {
-    if (campaign?.channel) setChannel(campaign.channel)
-    if (params?.channel) setChannel(params.channel)
-  }, [campaign, params])
+    if (campaign?.channel) setChannel(campaign.channel);
+    if (params?.channel) setChannel(params.channel);
+  }, [campaign, params]);
 
-  const {target, name, hashtag, template, talkingPoints } = campaign || {target: '', channel: ''};
-
-
+  const { target, name, hashtag, template, talkingPoints } = campaign || {
+    target: "",
+    channel: "",
+  };
 
   const [postcode, setPostcode] = useState(null);
 
@@ -132,6 +133,7 @@ export const PostCode = ({ campaign }) => {
                 />
               ) : (
                 <Emailer
+                  postcode={postcode}
                   campaign={campaign}
                   constituency={constituency}
                   region={region}

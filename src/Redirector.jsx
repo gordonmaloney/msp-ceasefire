@@ -5,6 +5,8 @@ import { Navigate, useParams } from "react-router";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { PostCode } from "./PostCode";
+import { API } from "./API";
+
 
 export const Redirector = () => {
   const params = useParams();
@@ -14,7 +16,7 @@ export const Redirector = () => {
 
   const getCampaign = async () => {
     const campaign = await axios.get(
-      "http://localhost:8000/api/campaigns/" + campaignName
+      API + '/' + campaignName
     );
     setCampaign(campaign.data);
   };

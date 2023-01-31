@@ -32,7 +32,7 @@ export const Landing = () => {
             our elected representatives. Use the buttons below to start:
           </p>
 
-          <Grid container justifyContent={"space-between"}>
+          <Grid spacing={3} container justifyContent={"space-around"}>
             <Grid item>
               {" "}
               <Button onClick={handleTweet} sx={BtnStyle}>

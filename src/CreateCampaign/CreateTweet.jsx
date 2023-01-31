@@ -41,34 +41,44 @@ export const CreateTweet = () => {
     target == "none" && setLength(tweetBody.length + hashtag.length + 2);
   }, [tweetBody, hashtag, target, customTarget]);
 
-
   const getCampaigns = async () => {
-    const campaigns = await fetch("http://localhost:8000/api/campaigns/all");
+    const campaigns = await fetch(API + "/all");
     const campaignsData = await campaigns.json();
     console.log(campaignsData);
-    setLinks(campaignsData)
+    setLinks(campaignsData);
   };
   useEffect(() => {
     getCampaigns();
   }, []);
 
-
+  //tooltip
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  useEffect(() => {
+    if (tooltipOpen) {
+      setTimeout(() => {
+        setTooltipOpen(false);
+      }, 1000);
+    }
+  }, [tooltipOpen]);
 
   const postLink = async () => {
     const body = {
-      name: name.replace(' ', '-'),
-      target: target !== "custom" ? target.replace("@", "") : customTarget.replace("@", ""),
+      name: name.replace(" ", "-"),
+      target:
+        target !== "custom"
+          ? target.replace("@", "")
+          : customTarget.replace("@", ""),
       channel: "tweet",
       hashtag: hashtag.replace("#", ""),
       template: tweetBody,
     };
-    const response = await axios.post("http://localhost:8000/api/campaigns", body)
+    const response = await axios.post(API, body);
 
     setLink(window.location.host + "/campaign/" + response.data.name);
     setShortLink(window.location.host + "/campaign/" + response.data.name);
-};
+  };
 
-console.log('link: ', link)
+  console.log("link: ", link);
   return (
     <div className="landing">
       <div className="landingContainer">
@@ -296,11 +306,7 @@ console.log('link: ', link)
         <br />
 
         <center>
-          <Button
-            disabled={length > 280}
-            sx={BtnStyle}
-            onClick={postLink}
-          >
+          <Button disabled={length > 280} sx={BtnStyle} onClick={postLink}>
             Generate link
           </Button>
           <br />
@@ -344,14 +350,35 @@ console.log('link: ', link)
             />
 
             <center>
-              <Button
-                onClick={() => {
-                  navigator.clipboard.writeText(shortLink);
+              <Tooltip
+                title="copied"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      bgcolor: "green",
+                      "& .MuiTooltip-arrow": {
+                        color: "green",
+                      },
+                    },
+                  },
                 }}
-                sx={BtnStyleSmall}
+                open={tooltipOpen}
+                disableFocusListener
+                disableHoverListener
+                disableTouchListener
+                placement="top"
+                arrow
               >
-                Copy
-              </Button>
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(shortLink);
+                    setTooltipOpen(true);
+                  }}
+                  sx={{ ...BtnStyleSmall }}
+                >
+                  Copy Link
+                </Button>
+              </Tooltip>
             </center>
           </>
         )}

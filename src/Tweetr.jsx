@@ -14,6 +14,12 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { msps } from "./Data/MSPS";
 
+//modal imports
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+import { ModalContent } from "./ModalContent";
+import { mobileStyle } from "./ModalContent";
+
 export const Tweetr = ({
   campaign,
   mspProp,
@@ -54,6 +60,15 @@ export const Tweetr = ({
     setFlash("flash");
     setTimeout(() => {
       setFlash("");
+    }, 1000);
+  };
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const openModal = () => {
+    setTimeout(() => {
+      setOpen(true);
     }, 1000);
   };
 
@@ -154,6 +169,7 @@ export const Tweetr = ({
           )
             .replace("#", "%23")
             .replace(/\n/g, "%0A")}`}
+          onClick={handleOpen}
         >
           Send Tweet
         </Button>
@@ -237,6 +253,30 @@ export const Tweetr = ({
           </Accordion>
         </div>
       )}
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={mobileStyle}>
+          <span
+            style={{
+              float: "right",
+              marginTop: "-23px",
+              marginRight: "-20px",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            x
+          </span>
+          <ModalContent />
+        </Box>
+      </Modal>
     </div>
   );
 };
