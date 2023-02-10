@@ -49,7 +49,7 @@ export const Tweetr = ({
       setMspHandle(handles.filter((hand) => hand.name == msp.name)[0].handle);
 
 
-      (!target || target == "Edinburgh") &&
+      (target == "Edinburgh") &&
       setMspHandle(targetCllrs.map((cllr) => cllr.twitter).join(", "));
 
     target &&
