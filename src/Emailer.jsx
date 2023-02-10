@@ -5,7 +5,7 @@ import { Chip, Paper } from "@mui/material";
 import { msps } from "./Data/MSPS";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { Checkbox, FormLabel, Grid, TextField, Button } from "@mui/material";
+import { Checkbox, FormLabel, Grid, TextField, Button, } from "@mui/material";
 import { BtnStyle, CheckBoxStyle, BtnStyleSmall } from "./Shared";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 //accordion imports
@@ -20,6 +20,7 @@ import { ModalContent } from "./ModalContent";
 import { mobileStyle } from "./ModalContent";
 
 import axios from "axios";
+import { OPTIN_API } from "./API";
 
 export const Emailer = ({
   campaign,
@@ -29,6 +30,8 @@ export const Emailer = ({
   region,
   setConstituency,
   postcode,
+  cllrs,
+  ward
 }) => {
   const [emailing, setEmailing] = useState([]);
   const [notEmailing, setNotEmailing] = useState([]);
@@ -39,6 +42,8 @@ export const Emailer = ({
   const [optIn, setOptIn] = useState(false);
 
   const [email, setEmail] = useState("");
+
+  const target = campaign?.target;
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -62,8 +67,14 @@ export const Emailer = ({
   }, [constMSPs]);
 
   useEffect(() => {
-    setEmailing(constMSPs);
+   target !== "Edinburgh" && setEmailing(constMSPs);
   }, [constMSPs]);
+
+  useEffect(() => {
+    target == "Edinburgh" && setEmailing(cllrs)
+  }, [target, ward, cllrs])
+
+  console.log(emailing)
 
   const handleOptin = async () => {
     console.log("opting in: ", optIn);
@@ -77,7 +88,7 @@ export const Emailer = ({
       console.log(body);
 
       const response = await axios.post(
-        "http://localhost:8002/api/optin",
+        OPTIN_API,
         body
       );
       console.log(response);
@@ -122,27 +133,27 @@ export const Emailer = ({
             {emailing.map((msp) => (
               <Chip
                 size="small"
-                label={msp.msp + " - " + msp.party}
+                label={msp.name + " - " + msp.party}
                 variant="outlined"
                 sx={{ backgroundColor: "white", margin: "2px" }}
                 onClick={() => {
                   setEmailing((prev) =>
-                    prev.filter((prevMSP) => prevMSP.msp !== msp.msp)
+                    prev.filter((prevMSP) => prevMSP.name !== msp.name)
                   );
                   setNotEmailing((prev) => [...prev, msp]);
                 }}
                 onDelete={() => {
                   setEmailing((prev) =>
-                    prev.filter((prevMSP) => prevMSP.msp !== msp.msp)
+                    prev.filter((prevMSP) => prevMSP.name !== msp.name)
                   );
                   setNotEmailing((prev) => [...prev, msp]);
                 }}
               ></Chip>
             ))}
-            {campaign?.target !== "msps" && (
+            {campaign?.target !== "msps" && campaign?.target !== "Edinburgh" && (
               <span style={{ marginLeft: "10px" }}>{campaign?.target}</span>
             )}
-            {campaign?.target == "msps" && emailing.length == 0 && (
+            {(campaign?.target == "msps" || campaign?.target == "Edinburgh") && emailing.length == 0 && (
               <div style={{ color: "red", marginLeft: "10px" }}>
                 You need to pick at least one recipient!
               </div>
@@ -178,7 +189,7 @@ export const Emailer = ({
                         color: "black",
                       }}
                     >
-                      MSPs you aren't emailing:
+                      {target == "Edinburgh" ? "Councillors " : "MSPs "}you aren't emailing:
                     </div>
                   </AccordionSummary>
                   <AccordionDetails
@@ -191,14 +202,14 @@ export const Emailer = ({
                     }}
                   >
                     <div style={{ marginLeft: "5px" }}>
-                      These are the MSPs not included in your email. If you'd
+                      These are the {target == "Edinburgh" ? "councillors " : "MSPs "} not included in your email. If you'd
                       like to include them, just tap their name.
                     </div>
                     <br />
                     {notEmailing.map((msp) => (
                       <Chip
                         size="small"
-                        label={msp.msp + " - " + msp.party}
+                        label={msp.name + " - " + msp.party}
                         variant="outlined"
                         sx={{ backgroundColor: "white", margin: "2px" }}
                         deleteIcon={
@@ -206,13 +217,13 @@ export const Emailer = ({
                         }
                         onDelete={() => {
                           setNotEmailing((prev) =>
-                            prev.filter((prevMSP) => prevMSP.msp !== msp.msp)
+                            prev.filter((prevMSP) => prevMSP.name !== msp.name)
                           );
                           setEmailing((prev) => [...prev, msp]);
                         }}
                         onClick={() => {
                           setNotEmailing((prev) =>
-                            prev.filter((prevMSP) => prevMSP.msp !== msp.msp)
+                            prev.filter((prevMSP) => prevMSP.name !== msp.name)
                           );
                           setEmailing((prev) => [...prev, msp]);
                         }}
@@ -317,14 +328,10 @@ export const Emailer = ({
               <center>
               <Button
                 href={`mailto:${
-                  !campaign?.target || campaign?.target == "msps"
+                  !campaign?.target || campaign?.target == "msps" || campaign?.target == "Edinburgh"
                     ? emailing.map((msp) => msp.email).join(",")
                     : campaign?.target
-                }?subject=${subject}&bcc=${
-                  optIn
-                    ? "emailLobby+OptIn@livingrent.org"
-                    : "emailLobby+OptOut@livingrent.org"
-                }&body=${
+                }?subject=${subject}&body=${
                   body.replace(/\n/g, "%0A") +
                   "%0A%0A" +
                   signOff.replace(/\n/g, "%0A")
@@ -351,14 +358,10 @@ export const Emailer = ({
                 size="large"
                 variant="contained"
                 href={`https://mail.google.com/mail/?view=cm&fs=1&to=${
-                  !campaign?.target || campaign?.target == "msps"
+                  !campaign?.target || campaign?.target == "msps"  || campaign?.target == "Edinburgh"
                     ? emailing.map((msp) => msp.email).join(",")
                     : campaign?.target
-                }&su=${subject}&bcc=${
-                  optIn
-                    ? "emailLobby%2BOptIn@livingrent.org"
-                    : "emailLobby%2BOptOut@livingrent.org"
-                }&body=${
+                }&su=${subject}&body=${
                   body.replace(/\n/g, "%0A") +
                   "%0A%0A" +
                   signOff.replace(/\n/g, "%0A")

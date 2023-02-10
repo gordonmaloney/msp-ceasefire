@@ -19,6 +19,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { ModalContent } from "./ModalContent";
 import { mobileStyle } from "./ModalContent";
+import { EDINBURGHCLLRS } from "./Data/EDINBURGHCLLRS";
 
 export const Tweetr = ({
   campaign,
@@ -27,6 +28,8 @@ export const Tweetr = ({
   constituency,
   region,
   setConstituency,
+  ward,
+  cllrs,
 }) => {
   const params = useParams();
 
@@ -39,9 +42,11 @@ export const Tweetr = ({
   const [tweetBody, setTweetBody] = useState("");
   const [msp, setMsp] = useState(mspProp);
 
+  const [targetCllrs, setTargetCllrs] = useState([]);
+
   useEffect(() => {
     (!target || target == "msps") &&
-      setMspHandle(handles.filter((hand) => hand.msp == msp.msp)[0].handle);
+      setMspHandle(handles.filter((hand) => hand.name == msp.name)[0].handle);
     target &&
       target !== "msps" &&
       target !== "none" &&
@@ -54,7 +59,14 @@ export const Tweetr = ({
       : setTweetBody(template);
   }, [mspHandle]);
 
-  const [flash, setFlash] = useState("");
+  useEffect(() => {
+    if (target && target == "Edinburgh") {
+      setTargetCllrs(cllrs.filter((cllr) => cllr.twitter !== "none"));
+      setMspHandle(targetCllrs.map(cllr => cllr.twitter).join(', '))
+    }
+  }, [target, cllrs, ward]);
+
+  const [flash, setFlash] = useState("") ;
   const refresh = () => {
     window.scrollTo(0, 0);
     setFlash("flash");
@@ -90,6 +102,15 @@ export const Tweetr = ({
           </span>
         </>
       )}
+      {target == "Edinburgh" && (
+        <>
+          <br />
+          <br /> It looks like you live in <b>{ward}</b>. If that's wrong,{" "}
+          <span onClick={() => setConstituency()} style={{ cursor: "pointer" }}>
+            <u>click here to go back.</u>
+          </span>
+        </>
+      )}
       {mspHandle !== "none" ? (
         <>
           {target == "msps" || !target ? (
@@ -98,11 +119,22 @@ export const Tweetr = ({
               <br />
               You're tweeting:{" "}
               <b>
-                {msp.msp}, {msp.party}
+                {msp.name} - {msp.party}
               </b>
             </span>
           ) : target == "none" ? (
             <></>
+          ) : target == "Edinburgh" ? (
+            <>
+              <br />
+              <br />
+              You're tweeing{" "}
+              {targetCllrs.map((cllr, idx) => (
+                <><b>{cllr.name} - {cllr.party}</b>{idx == targetCllrs.length-1 ? ' ': idx == targetCllrs.length-2 ? ' and ':', '}</>
+              ))}
+              <br/><br/>
+              <em>Note - not all councillors use Twitter, which is why you might not see all of yours here.</em>
+            </>
           ) : (
             <>
               <br />
@@ -213,16 +245,16 @@ export const Tweetr = ({
                       item
                       sx={{ width: "120px", cursor: "pointer" }}
                       onClick={() => {
-                        handles.filter((hand) => hand.msp == filtMsp.msp)[0]
+                        handles.filter((hand) => hand.name == filtMsp.name)[0]
                           .handle !== "none" && setMsp(filtMsp);
                         refresh();
                       }}
                     >
-                      <b>{filtMsp.msp}</b>
+                      <b>{filtMsp.name}</b>
                       <br />
                       {filtMsp.party}
                       <br />
-                      {handles.filter((hand) => hand.msp == filtMsp.msp)[0]
+                      {handles.filter((hand) => hand.name == filtMsp.name)[0]
                         .handle !== "none" ? (
                         <Button
                           sx={{
@@ -232,13 +264,13 @@ export const Tweetr = ({
                             paddingTop: "2px",
                           }}
                           onClick={() => {
-                            handles.filter((hand) => hand.msp == filtMsp.msp)[0]
+                            handles.filter((hand) => hand.name == filtMsp.name)[0]
                               .handle !== "none" && setMsp(filtMsp);
                             refresh();
                           }}
                         >
                           {
-                            handles.filter((hand) => hand.msp == filtMsp.msp)[0]
+                            handles.filter((hand) => hand.name == filtMsp.name)[0]
                               .handle
                           }
                         </Button>

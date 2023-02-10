@@ -10,6 +10,10 @@ import { handles } from "./Data/HANDLES";
 import { BtnStyle, BtnStyleSmall } from "./Shared";
 import { useParams } from "react-router-dom";
 
+
+import { EDINBURGHCLLRS } from "./Data/EDINBURGHCLLRS";
+
+
 export const PostCode = ({ campaign }) => {
   const params = useParams();
 
@@ -30,8 +34,10 @@ export const PostCode = ({ campaign }) => {
   const [gotPostcode, setGotPostcode] = useState(false);
 
   const [constituency, setConstituency] = useState(null);
+  const [ward, setWard] = useState(null)
   const [region, setRegion] = useState(null);
   const [constMSPs, setConstMSPs] = useState([]);
+  const [cllrs, setCllrs] = useState([])
 
   const [invalid, setInvalid] = useState(false);
 
@@ -41,8 +47,15 @@ export const PostCode = ({ campaign }) => {
         `https://api.postcodes.io/scotland/postcodes/${postcode}`
       );
 
+      const wardResponse = await fetch(
+        `https://api.postcodes.io/postcodes/${postcode}`
+      );
+
       const data = await response.json();
+      const wardData = await wardResponse.json()
       invalid && setInvalid(false);
+      console.log(wardData.result)
+      setWard(wardData.result.admin_ward)
       setConstituency(data.result.scottish_parliamentary_constituency);
     } catch {
       setInvalid(true);
@@ -58,6 +71,13 @@ export const PostCode = ({ campaign }) => {
       );
     }
   }, [constituency]);
+
+  useEffect(() => {
+    if (ward) {
+      setCllrs(EDINBURGHCLLRS.filter(cllr => cllr.ward == ward))
+    }
+  }, [ward])
+  console.log(ward, cllrs)
 
   useEffect(() => {
     setConstMSPs(
@@ -76,11 +96,11 @@ export const PostCode = ({ campaign }) => {
   return (
     <>
       <div className={`landing ${fade}`}>
-        {!constituency && (!target || target == "msps") ? (
+        {!constituency && (!target || target == "msps" || target=="Edinburgh") ? (
           <>
             <div className="landingContainerSmall">
               <span className="bebas header header2">
-                {channel == "email" ? "Email your MSP" : "Tweet your MSP"}
+                {channel == "email" ? `Email your ${target !== "Edinburgh" ? "MSP" : "Councillor"}` : `Tweet your ${target !== "Edinburgh" ? "MSP" : "Councillor"}`}
               </span>
               <br />
               <br />
@@ -125,6 +145,8 @@ export const PostCode = ({ campaign }) => {
                   campaign={campaign}
                   constituency={constituency}
                   region={region}
+                  ward={ward}
+                  cllrs={cllrs}
                   setConstituency={() => setConstituency(null)}
                   constMSPs={constMSPs}
                   mspProp={
@@ -137,6 +159,8 @@ export const PostCode = ({ campaign }) => {
                   campaign={campaign}
                   constituency={constituency}
                   region={region}
+                  ward={ward}
+                  cllrs={cllrs}
                   setConstituency={() => setConstituency(null)}
                   constMSPs={constMSPs}
                   mspProp={
