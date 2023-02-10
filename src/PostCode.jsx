@@ -10,9 +10,7 @@ import { handles } from "./Data/HANDLES";
 import { BtnStyle, BtnStyleSmall } from "./Shared";
 import { useParams } from "react-router-dom";
 
-
 import { EDINBURGHCLLRS } from "./Data/EDINBURGHCLLRS";
-
 
 export const PostCode = ({ campaign }) => {
   const params = useParams();
@@ -34,10 +32,10 @@ export const PostCode = ({ campaign }) => {
   const [gotPostcode, setGotPostcode] = useState(false);
 
   const [constituency, setConstituency] = useState(null);
-  const [ward, setWard] = useState(null)
+  const [ward, setWard] = useState(null);
   const [region, setRegion] = useState(null);
   const [constMSPs, setConstMSPs] = useState([]);
-  const [cllrs, setCllrs] = useState([])
+  const [cllrs, setCllrs] = useState([]);
 
   const [invalid, setInvalid] = useState(false);
 
@@ -52,10 +50,12 @@ export const PostCode = ({ campaign }) => {
       );
 
       const data = await response.json();
-      const wardData = await wardResponse.json()
+      const wardData = await wardResponse.json();
       invalid && setInvalid(false);
-      console.log(wardData.result)
-      setWard(wardData.result.admin_ward)
+      console.log(wardData.result);
+      wardData.result.admin_district == "City of Edinburgh"
+        ? setWard(wardData.result.admin_ward)
+        : setInvalid(true);
       setConstituency(data.result.scottish_parliamentary_constituency);
     } catch {
       setInvalid(true);
@@ -74,10 +74,10 @@ export const PostCode = ({ campaign }) => {
 
   useEffect(() => {
     if (ward) {
-      setCllrs(EDINBURGHCLLRS.filter(cllr => cllr.ward == ward))
+      setCllrs(EDINBURGHCLLRS.filter((cllr) => cllr.ward == ward));
     }
-  }, [ward])
-  console.log(ward, cllrs)
+  }, [ward]);
+  console.log(ward, cllrs);
 
   useEffect(() => {
     setConstMSPs(
@@ -96,11 +96,19 @@ export const PostCode = ({ campaign }) => {
   return (
     <>
       <div className={`landing ${fade}`}>
-        {!constituency && (!target || target == "msps" || target=="Edinburgh") ? (
+        {invalid ||
+        (!constituency &&
+          (!target || target == "msps" || target == "Edinburgh")) ? (
           <>
             <div className="landingContainerSmall">
               <span className="bebas header header2">
-                {channel == "email" ? `Email your ${target !== "Edinburgh" ? "MSP" : "Councillor"}` : `Tweet your ${target !== "Edinburgh" ? "MSP" : "Councillor"}`}
+                {channel == "email"
+                  ? `Email your ${
+                      target !== "Edinburgh" ? "MSP" : "Councillor"
+                    }`
+                  : `Tweet your ${
+                      target !== "Edinburgh" ? "MSP" : "Councillor"
+                    }`}
               </span>
               <br />
               <br />
@@ -127,9 +135,14 @@ export const PostCode = ({ campaign }) => {
                   }}
                 />
                 {invalid && (
-                  <h5>This postcode doesn't seem to be valid! Try again</h5>
+                  <h5>
+                    This postcode doesn't seem to be valid!
+                    <br />
+                    That might be because this campaign is only targeting people
+                    in a specific area, but if you think that's wrong then try
+                    again.
+                  </h5>
                 )}
-                <br />
                 <br />
                 <Button sx={BtnStyle} onClick={() => fetchPostcodeDeets()}>
                   Draft your {channel == "email" ? "email" : "tweet"}

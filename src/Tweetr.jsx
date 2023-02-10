@@ -36,7 +36,7 @@ export const Tweetr = ({
   const hashtag = "#" + (campaign?.hashtag || "RentControlsNow");
   const template = campaign?.template || "what are you doing for tenants? ";
 
-  const target = campaign?.target;
+  const [target, setTarget] = useState(campaign?.target);
 
   const [mspHandle, setMspHandle] = useState("");
   const [tweetBody, setTweetBody] = useState("");
@@ -47,11 +47,17 @@ export const Tweetr = ({
   useEffect(() => {
     (!target || target == "msps") &&
       setMspHandle(handles.filter((hand) => hand.name == msp.name)[0].handle);
+
+
+      (!target || target == "Edinburgh") &&
+      setMspHandle(targetCllrs.map((cllr) => cllr.twitter).join(", "));
+
     target &&
       target !== "msps" &&
+      target !== "Edinburgh" &&
       target !== "none" &&
       setMspHandle("@" + target);
-  }, [msp, mspProp, constMSPs]);
+  }, [msp, mspProp, constMSPs, targetCllrs]);
 
   useEffect(() => {
     target !== "none"
@@ -62,11 +68,10 @@ export const Tweetr = ({
   useEffect(() => {
     if (target && target == "Edinburgh") {
       setTargetCllrs(cllrs.filter((cllr) => cllr.twitter !== "none"));
-      setMspHandle(targetCllrs.map(cllr => cllr.twitter).join(', '))
     }
   }, [target, cllrs, ward]);
 
-  const [flash, setFlash] = useState("") ;
+  const [flash, setFlash] = useState("");
   const refresh = () => {
     window.scrollTo(0, 0);
     setFlash("flash");
@@ -130,10 +135,23 @@ export const Tweetr = ({
               <br />
               You're tweeing{" "}
               {targetCllrs.map((cllr, idx) => (
-                <><b>{cllr.name} - {cllr.party}</b>{idx == targetCllrs.length-1 ? ' ': idx == targetCllrs.length-2 ? ' and ':', '}</>
+                <>
+                  <b>
+                    {cllr.name} - {cllr.party}
+                  </b>
+                  {idx == targetCllrs.length - 1
+                    ? " "
+                    : idx == targetCllrs.length - 2
+                    ? " and "
+                    : ", "}
+                </>
               ))}
-              <br/><br/>
-              <em>Note - not all councillors use Twitter, which is why you might not see all of yours here.</em>
+              <br />
+              <br />
+              <em>
+                Note - not all councillors use Twitter, which is why you might
+                not see all of yours here.
+              </em>
             </>
           ) : (
             <>
@@ -264,14 +282,16 @@ export const Tweetr = ({
                             paddingTop: "2px",
                           }}
                           onClick={() => {
-                            handles.filter((hand) => hand.name == filtMsp.name)[0]
-                              .handle !== "none" && setMsp(filtMsp);
+                            handles.filter(
+                              (hand) => hand.name == filtMsp.name
+                            )[0].handle !== "none" && setMsp(filtMsp);
                             refresh();
                           }}
                         >
                           {
-                            handles.filter((hand) => hand.name == filtMsp.name)[0]
-                              .handle
+                            handles.filter(
+                              (hand) => hand.name == filtMsp.name
+                            )[0].handle
                           }
                         </Button>
                       ) : (

@@ -193,6 +193,7 @@ console.log('link: ', link)
           }}
         >
           <MenuItem value="msps">MSPs</MenuItem>
+          <MenuItem value="Edinburgh">Edinburgh City Council</MenuItem>
           <MenuItem value="custom">Custom</MenuItem>
         </Select>
 
