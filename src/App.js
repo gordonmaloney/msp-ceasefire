@@ -20,9 +20,6 @@ function App() {
           <Route path="/" exact element={<Landing />} />
           <Route path="/newcampaign" element={<CreateCampaignLanding />} />
 
-          <Route path="/create/tweet" element={<CreateTweet />} />
-          <Route path="/create/email" element={<CreateEmail />} />
-
           <Route path="/:channel" element={<PostCode />} />
 
           <Route path="/campaign/:campaign" element={<Redirector />} />

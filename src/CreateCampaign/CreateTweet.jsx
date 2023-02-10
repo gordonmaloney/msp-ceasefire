@@ -320,6 +320,8 @@ export const CreateTweet = () => {
               encodeURIComponent(
                 (target == "msps"
                   ? "Hi @PatrickHarvie, "
+                  : target == "Edinburgh"
+                  ? "Hi @adamrmcvey, "
                   : target == "custom"
                   ? `Hi @${customTarget.replace("@", "")}, `
                   : ``) +

@@ -135,7 +135,7 @@ export const PostCode = ({ campaign }) => {
                   }}
                 />
                 {invalid && (
-                  <h5>
+                  <h5 style={{marginBottom: '-10px'}}>
                     This postcode doesn't seem to be valid!
                     <br />
                     That might be because this campaign is only targeting people
@@ -143,7 +143,7 @@ export const PostCode = ({ campaign }) => {
                     again.
                   </h5>
                 )}
-                <br />
+                <br /><br />
                 <Button sx={BtnStyle} onClick={() => fetchPostcodeDeets()}>
                   Draft your {channel == "email" ? "email" : "tweet"}
                 </Button>
