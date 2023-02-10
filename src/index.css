@@ -195,4 +195,7 @@ height: 0px !important;
     visibility: visible;
     height: 35px !important;
   }
+  .NavBarLink {
+    font-size: 20px;
+  }
 }

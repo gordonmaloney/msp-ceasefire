@@ -19,8 +19,14 @@ export const Header = () => {
         </span>
       </Link>
 
+      <Link to="../newcampaign">
+        <span className="bebas header3 header NavBarLink" style={{ margin: 0}}>
+          Create campaign
+        </span>
+      </Link>
+
       <a href="https://www.livingrent.org" target="_blank">
-        <span className="bebas header3 header" style={{ margin: 0, paddingRight: "20px" }}>
+        <span className="bebas header3 header NavBarLink" style={{ margin: 0, paddingRight: "20px" }}>
           Living Rent
         </span>
       </a>
