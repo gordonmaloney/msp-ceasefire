@@ -8,8 +8,9 @@ import { Redirector } from "./Redirector";
 import { EmailCampaign } from "./EmailCampaign";
 import { Landing } from "./Landing";
 import { CreateCampaignLanding } from "./CreateCampaign/CreateCampaignLanding";
-import { CreateTweet } from "./CreateCampaign/CreateTweet";
-import { CreateEmail } from "./CreateCampaign/CreateEmail";
+
+
+import { EditCampaignLanding } from "./CreateCampaign/EditCampaignLanding";
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
           <Route path="/:channel" element={<PostCode />} />
 
           <Route path="/campaign/:campaign" element={<Redirector />} />
+
+          <Route path="/campaign/:campaign/edit" element={<EditCampaignLanding />} />
+
           <Route path="/:target/:hashtag/:template" element={<PostCode />} />
         </Routes>
       </BrowserRouter>
