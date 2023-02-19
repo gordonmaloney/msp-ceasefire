@@ -15,7 +15,7 @@ import { Tooltip } from "@mui/material";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import { API } from "../API";
 import axios from "axios";
-
+import { QR } from "../QR";
 
 export const CreateEmail = () => {
   const [emailBody, setEmailBody] = useState("");
@@ -25,47 +25,45 @@ export const CreateEmail = () => {
 
   const [name, setName] = useState("");
   const [shortLink, setShortLink] = useState("");
-const [subject, setSubject] = useState('')
+  const [subject, setSubject] = useState("");
   const [links, setLinks] = useState();
 
-    //tooltip
-    const [tooltipOpen, setTooltipOpen] = useState(false);
-    useEffect(() => {
-      if (tooltipOpen) {
-        setTimeout(() => {
-          setTooltipOpen(false);
-        }, 1000);
-      }
-    }, [tooltipOpen]);
+  //tooltip
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  useEffect(() => {
+    if (tooltipOpen) {
+      setTimeout(() => {
+        setTooltipOpen(false);
+      }, 1000);
+    }
+  }, [tooltipOpen]);
 
   const getCampaigns = async () => {
     const campaigns = await fetch(API + "/all");
     const campaignsData = await campaigns.json();
     console.log(campaignsData);
-    setLinks(campaignsData)
+    setLinks(campaignsData);
   };
   useEffect(() => {
     getCampaigns();
   }, []);
 
-
-
   const postLink = async () => {
     const body = {
-      name: name.replace(' ', '-'),
+      name: name.replace(" ", "-"),
       target: target !== "custom" ? target : customTarget,
       channel: "email",
-      hashtag: 'none',
+      hashtag: "none",
       template: emailBody,
-      subject
+      subject,
     };
-    const response = await axios.post(API, body)
+    const response = await axios.post(API, body);
 
     setLink(window.location.host + "/campaign/" + response.data.name);
     setShortLink(window.location.host + "/campaign/" + response.data.name);
-};
+  };
 
-console.log('link: ', link)
+  console.log("link: ", link);
   return (
     <div className="landing">
       <div className="landingContainer">
@@ -106,9 +104,10 @@ console.log('link: ', link)
           InputProps={{
             style: {
               backgroundColor: "white",
-            },}}
+            },
+          }}
         />
-        <br/>
+        <br />
         <FormLabel sx={{ color: "white" }}>
           <Tooltip
             componentsProps={{
@@ -144,9 +143,9 @@ console.log('link: ', link)
           InputProps={{
             style: {
               backgroundColor: "white",
-            },}}
+            },
+          }}
         />
-
 
         <br />
         <FormLabel sx={{ color: "white" }}>
@@ -203,11 +202,7 @@ console.log('link: ', link)
             <TextField
               id="customTarget"
               value={customTarget}
-              onChange={(e) =>
-                setCustomTarget(
-                  `${e.target.value}`
-                )
-              }
+              onChange={(e) => setCustomTarget(`${e.target.value}`)}
               sx={{ marginTop: "3px", width: "230px" }}
               InputProps={{
                 style: {
@@ -253,12 +248,23 @@ console.log('link: ', link)
             },
           }}
           onChange={(e) => setName(e.target.value)}
+          helperText={
+            <span style={{ color: "red" }}>
+              {name !== "" &&
+                links?.filter((link) => link.name == name).length > 0 &&
+                "Name in use - choose another!"}
+            </span>
+          }
         />
         <br />
         <br />
 
         <center>
           <Button
+            disabled={
+              name !== "" &&
+              links?.filter((link) => link.name == name).length > 0
+            }
             sx={BtnStyle}
             onClick={postLink}
           >
@@ -266,7 +272,6 @@ console.log('link: ', link)
           </Button>
           <br />
           <br />
-         
         </center>
 
         {link && (
@@ -286,35 +291,38 @@ console.log('link: ', link)
             />
 
             <center>
-            <Tooltip
-          title="copied"
-          componentsProps={{
-            tooltip: {
-              sx: {
-                bgcolor: "green",
-                "& .MuiTooltip-arrow": {
-                  color: "green",
-                },
-              },
-            },
-          }}
-          open={tooltipOpen}
-          disableFocusListener
-          disableHoverListener
-          disableTouchListener
-          placement="top"
-          arrow
-        >
-          <Button
-            onClick={() => {
-              navigator.clipboard.writeText(shortLink);
-              setTooltipOpen(true);
-            }}
-            sx={{ ...BtnStyleSmall}}
-          >
-            Copy Link
-          </Button>
-        </Tooltip>
+              <Tooltip
+                title="copied"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      bgcolor: "green",
+                      "& .MuiTooltip-arrow": {
+                        color: "green",
+                      },
+                    },
+                  },
+                }}
+                open={tooltipOpen}
+                disableFocusListener
+                disableHoverListener
+                disableTouchListener
+                placement="top"
+                arrow
+              >
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(shortLink);
+                    setTooltipOpen(true);
+                  }}
+                  sx={{ ...BtnStyleSmall }}
+                >
+                  Copy Link
+                </Button>
+              </Tooltip>
+              <br />
+              <br />
+              <QR link={shortLink} />{" "}
             </center>
           </>
         )}

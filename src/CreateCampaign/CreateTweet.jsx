@@ -7,7 +7,7 @@ import {
   FormControl,
   Paper,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { BtnStyle, BtnStyleSmall } from "../Shared";
 import React from "react";
 import { useEffect } from "react";
@@ -15,6 +15,7 @@ import { Tooltip } from "@mui/material";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import { API } from "../API";
 import axios from "axios";
+import { QR } from "../QR";
 
 export const CreateTweet = () => {
   const [tweetBody, setTweetBody] = useState("");
@@ -302,12 +303,27 @@ export const CreateTweet = () => {
             },
           }}
           onChange={(e) => setName(e.target.value)}
+          helperText={
+            <span style={{ color: "red" }}>
+              {name !== "" &&
+                links?.filter((link) => link.name == name).length > 0 &&
+                "Name in use - choose another!"}
+            </span>
+          }
         />
         <br />
         <br />
 
         <center>
-          <Button disabled={length > 280} sx={BtnStyle} onClick={postLink}>
+          <Button
+            disabled={
+              length > 280 ||
+              (name !== "" &&
+                links?.filter((link) => link.name == name).length > 0)
+            }
+            sx={BtnStyle}
+            onClick={postLink}
+          >
             Generate link
           </Button>
           <br />
@@ -382,6 +398,10 @@ export const CreateTweet = () => {
                   Copy Link
                 </Button>
               </Tooltip>
+
+              <br />
+              <br />
+              <QR link={shortLink} />
             </center>
           </>
         )}

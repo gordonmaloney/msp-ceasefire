@@ -1,30 +1,35 @@
-import {useState} from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button, Grid } from "@mui/material";
 import { BtnStyle } from "./Shared";
 import { useNavigate } from "react-router";
+import { QR } from "./QR";
+
 
 export const Landing = () => {
   const navigate = useNavigate();
 
-    const [vanish, setVanish] = useState('')
+  const [vanish, setVanish] = useState("");
+
+  const handleEmail = () => {
+    setVanish("vanishLeft");
+    setTimeout(() => {
+      navigate("../email");
+    }, 500);
+  };
+  const handleTweet = () => {
+    setVanish("vanishRight");
+    setTimeout(() => {
+      navigate("../tweet");
+    }, 500);
+  };
 
 
-    const handleEmail = () => {
-        setVanish('vanishLeft')
-        setTimeout(() => {
-            navigate('../email')
-        }, 500)
-    }
-    const handleTweet = () => {
-        setVanish('vanishRight')
-        setTimeout(() => {
-            navigate('../tweet')
-        }, 500)
-    }
   return (
-    <div className="landing" style={{overFlowX: 'hidden'}}>
+    <div className="landing" style={{ overFlowX: "hidden" }}>
       <div className={`landingContainerSmall ${vanish}`}>
         <div className="landingInner">
+
+
           <span className="bebas header header2">Raise your voice</span>
 
           <p>

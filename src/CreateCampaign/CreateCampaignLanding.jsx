@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Grid, TextField } from "@mui/material";
 import { BtnStyle } from "../Shared";
 import { useNavigate } from "react-router";
 import { TopSecret } from "../TopSecret";
 import { CreateEmail } from "./CreateEmail";
 import { CreateTweet } from "./CreateTweet";
+import axios from "axios";
+import { API } from "../API";
+import { EditDashboard } from "./EditDashboard";
 
 export const CreateCampaignLanding = () => {
   const navigate = useNavigate();
@@ -14,6 +17,18 @@ export const CreateCampaignLanding = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [password, setPassword] = useState("");
   const [incorrect, setIncorrect] = useState(false);
+  const [campaigns, setCampaigns] = useState([])
+
+  const getAllCampaigns = async () => {
+    const campaign = await axios.get(
+      API + '/all'
+    );
+    console.log(campaign)
+    setCampaigns(campaign.data);
+  }
+  useEffect(() => {
+    if (loggedIn) getAllCampaigns()
+  }, [loggedIn])
 
   const [show, setShow] = useState("");
 
@@ -46,8 +61,8 @@ const handleSubmit = (e) => {
     return (
       <>
       {show == "" &&
-      <div className="landing" style={{ overFlowX: "hidden" }}>
-        <div className={`landingContainerSmall ${vanish}`}>
+      <div className="landing" style={{ }}>
+        <div className={`landingContainerSmall ${vanish}`} style={{marginBottom: '-30px'}}>
           <div className="landingInner">
             <span className="bebas header header2">Create a campaign</span>
 
@@ -69,6 +84,8 @@ const handleSubmit = (e) => {
             </Grid>
           </div>
         </div>
+
+        <EditDashboard campaigns={campaigns} />
       </div>} 
       {show == "email" && <CreateEmail />}
       {show == "tweet" && <CreateTweet />}
@@ -91,9 +108,7 @@ const handleSubmit = (e) => {
               </p>
 
               <center>
-                <form>
                   <TextField
-                    onSubmit={(e) => e.preventDefault()}
                     placeholder="Enter your password here"
                     id="password"
                     type="password"
@@ -119,7 +134,6 @@ const handleSubmit = (e) => {
                   <Button onClick={(e) => handleSubmit(e)} sx={BtnStyle}>
                     Log in
                   </Button>
-                </form>
               </center>
             </div>
           </div>

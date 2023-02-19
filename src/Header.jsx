@@ -23,12 +23,12 @@ export const Header = () => {
       </Link>
 
       <div>
-        <Link to="../newcampaign">
+        <Link to="../admin" style={{display: 'none'}}>
           <span
             className="bebas header3 header NavBarLink"
             style={{ margin: 0, paddingRight: '4vw'}}
           >
-            Create campaign
+            Admin
           </span>
         </Link>
 

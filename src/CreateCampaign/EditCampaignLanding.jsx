@@ -8,14 +8,11 @@ import { EditTweet } from "./EditTweet";
 import axios from "axios";
 import { API } from "../API";
 import { useParams } from "react-router";
-
 export const EditCampaignLanding = () => {
 
   const params = useParams();
   const campaignName = params.campaign;
   const [campaign, setCampaign] = useState({});
-
-  console.log(campaign)
 
   const getCampaign = async () => {
     const campaign = await axios.get(
@@ -25,7 +22,7 @@ export const EditCampaignLanding = () => {
   };
   useEffect(() => {
     getCampaign()
-  }, campaignName)
+  }, [campaignName])
 
   const [vanish, setVanish] = useState("");
 

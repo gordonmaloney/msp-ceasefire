@@ -15,7 +15,7 @@ import {
   import HelpCenterIcon from "@mui/icons-material/HelpCenter";
   import { API } from "../API";
   import axios from "axios";
-  
+  import {QR} from '../QR'
   export const EditTweet = ({campaign}) => {
     const [tweetBody, setTweetBody] = useState(campaign.template);
     const [hashtag, setHashtag] = useState(campaign.hashtag);
@@ -381,6 +381,9 @@ import {
                     Copy Link
                   </Button>
                 </Tooltip>
+              <br />
+              <br />
+              <QR link={shortLink} />{" "}
               </center>
             </>
           )}

@@ -19,7 +19,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" exact element={<Landing />} />
-          <Route path="/newcampaign" element={<CreateCampaignLanding />} />
+          <Route path="/admin" element={<CreateCampaignLanding />} />
 
           <Route path="/:channel" element={<PostCode />} />
 

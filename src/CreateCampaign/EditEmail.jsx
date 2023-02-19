@@ -15,6 +15,7 @@ import { Tooltip } from "@mui/material";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import { API } from "../API";
 import axios from "axios";
+import { QR } from "../QR";
 
 export const EditEmail = ({ campaign }) => {
   const [emailBody, setEmailBody] = useState(campaign.template);
@@ -311,6 +312,9 @@ export const EditEmail = ({ campaign }) => {
                   Copy Link
                 </Button>
               </Tooltip>
+              <br />
+              <br />
+              <QR link={shortLink} />{" "}
             </center>
           </>
         )}
