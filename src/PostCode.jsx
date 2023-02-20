@@ -14,9 +14,8 @@ import { EDINBURGHCLLRS } from "./Data/EDINBURGHCLLRS";
 
 export const PostCode = ({ campaign }) => {
   const params = useParams();
-
-  console.log(params.channel);
   const [channel, setChannel] = useState("");
+
   useEffect(() => {
     if (campaign?.channel) setChannel(campaign.channel);
     if (params?.channel) setChannel(params.channel);
@@ -26,6 +25,7 @@ export const PostCode = ({ campaign }) => {
     target: "",
     channel: "",
   };
+
 
   const [postcode, setPostcode] = useState(null);
 
@@ -52,10 +52,9 @@ export const PostCode = ({ campaign }) => {
       const data = await response.json();
       const wardData = await wardResponse.json();
       invalid && setInvalid(false);
-      console.log(wardData.result);
-      wardData.result.admin_district == "City of Edinburgh"
+      if (target == "Edinburgh") {wardData.result.admin_district == "City of Edinburgh"
         ? setWard(wardData.result.admin_ward)
-        : setInvalid(true);
+        : setInvalid(true);}
       setConstituency(data.result.scottish_parliamentary_constituency);
     } catch {
       setInvalid(true);
@@ -77,14 +76,22 @@ export const PostCode = ({ campaign }) => {
       setCllrs(EDINBURGHCLLRS.filter((cllr) => cllr.ward == ward));
     }
   }, [ward]);
-  console.log(ward, cllrs);
+
+
+  let Parties = ['SNP', 'Labour', 'Tory', 'LibDem', 'Green']
 
   useEffect(() => {
-    setConstMSPs(
+    if (Parties.includes(target)) {
+      setConstMSPs(
+        msps.filter(
+          (msp) => (msp.constituency == constituency || msp.constituency == region)
+        ).filter(msp => msp.party == target)
+      )
+    } else {setConstMSPs(
       msps.filter(
         (msp) => msp.constituency == constituency || msp.constituency == region
       )
-    );
+    )}
   }, [region]);
 
   //fade in
@@ -93,12 +100,13 @@ export const PostCode = ({ campaign }) => {
     setFade("fadeFinished");
   }, []);
 
+
   return (
     <>
       <div className={`landing ${fade}`}>
         {invalid ||
         (!constituency &&
-          (!target || target == "msps" || target == "Edinburgh")) ? (
+          (!target || target == "msps" || target == "Edinburgh" || Parties.includes(target))) ? (
           <>
             <div className="landingContainerSmall">
               <span className="bebas header header2">

@@ -22,6 +22,7 @@ export const CreateTweet = () => {
   const [hashtag, setHashtag] = useState("#");
   const [target, setTarget] = useState("msps");
   const [customTarget, setCustomTarget] = useState("@");
+  const [party, setParty] = useState('')
   const [link, setLink] = useState("");
 
   const [name, setName] = useState("");
@@ -66,9 +67,9 @@ export const CreateTweet = () => {
     const body = {
       name: name.replace(" ", "-"),
       target:
-        target !== "custom"
-          ? target.replace("@", "")
-          : customTarget.replace("@", ""),
+       ( target == "custom" || target=="party")
+          ? customTarget.replace("@", "")
+          : target.replace("@", ""),
       channel: "tweet",
       hashtag: hashtag.replace("#", ""),
       template: tweetBody,
@@ -227,8 +228,7 @@ export const CreateTweet = () => {
             marginBottom: "5px",
             marginLeft: "5px",
 
-            width: target == "custom" ? "40px" : "100px",
-            color: target == "custom" ? "transparent" : "black",
+            width: target == "custom" || target == "party" ? "100px" : "100%",
             transition: "0s !important",
 
             "& .MuiInputBase-input": {
@@ -239,14 +239,14 @@ export const CreateTweet = () => {
           }}
         >
           <MenuItem value="msps">MSPs</MenuItem>
+          <MenuItem value="party">MSPs by party</MenuItem>
           <MenuItem value="custom">Custom</MenuItem>
           <MenuItem value="Edinburgh">Edinburgh City Council</MenuItem>
           <MenuItem value="none">None</MenuItem>
         </Select>
 
         {target == "custom" && (
-          <>
-            {" "}
+          <>{" "}
             <TextField
               id="customTarget"
               value={customTarget}
@@ -267,6 +267,32 @@ export const CreateTweet = () => {
               }}
             ></TextField>
           </>
+        )}
+
+        {target == "party" && (<>
+           <Select
+           value={customTarget}
+           className="notFlash"
+           onChange={(e) => setCustomTarget(e.target.value)}
+           sx={{
+             backgroundColor: "white",
+             marginTop: "3px",
+             marginBottom: "5px",
+             marginLeft: "5px",
+ 
+             "& .MuiInputBase-input": {
+               padding: "11.5px",
+               paddingLeft: "10px",
+               paddingRight: "0",
+             },
+           }}
+         >
+           <MenuItem value="SNP">SNP</MenuItem>
+           <MenuItem value="Labour">Labour</MenuItem>
+           <MenuItem value="Green">Green</MenuItem>
+           <MenuItem value="Tory">Tory</MenuItem>
+           <MenuItem value="LibDem">LibDem</MenuItem>
+         </Select></>
         )}
 
         <br />

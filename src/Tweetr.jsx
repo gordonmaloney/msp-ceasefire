@@ -44,8 +44,12 @@ export const Tweetr = ({
 
   const [targetCllrs, setTargetCllrs] = useState([]);
 
+  let Parties = ['SNP', 'Labour', 'Tory', 'LibDem', 'Green']
+
   useEffect(() => {
-    (!target || target == "msps") &&
+
+
+    (!target || target == "msps" || Parties.includes(target)) &&
       setMspHandle(handles.filter((hand) => hand.name == msp.name)[0].handle);
 
 
@@ -53,6 +57,7 @@ export const Tweetr = ({
       setMspHandle(targetCllrs.map((cllr) => cllr.twitter).join(", "));
 
     target &&
+      !Parties.includes(target) &&
       target !== "msps" &&
       target !== "Edinburgh" &&
       target !== "none" &&
@@ -94,7 +99,7 @@ export const Tweetr = ({
       <span className="bebas header header2">
         {target == "msps" ? "Tweet your MSP" : "Write your tweet"}
       </span>
-      {(target == "msps" || !target) && (
+      {(target == "msps" || !target || Parties.includes(target)) && (
         <>
           <br />
           <br /> It looks like you live in{" "}
@@ -118,7 +123,7 @@ export const Tweetr = ({
       )}
       {mspHandle !== "none" ? (
         <>
-          {target == "msps" || !target ? (
+          {target == "msps" || !target || Parties.includes(target) ? (
             <span>
               <br />
               <br />

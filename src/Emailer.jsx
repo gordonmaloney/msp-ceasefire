@@ -53,6 +53,7 @@ export const Emailer = ({
       setOpen(true);
     }, 1000);
   };
+  let Parties = ['SNP', 'Labour', 'Tory', 'LibDem', 'Green']
 
   useEffect(() => {
     if (campaign) {
@@ -150,10 +151,10 @@ export const Emailer = ({
                 }}
               ></Chip>
             ))}
-            {campaign?.target !== "msps" && campaign?.target !== "Edinburgh" && (
+            {campaign?.target !== "msps" && campaign?.target !== "Edinburgh" && !Parties.includes(target) && (
               <span style={{ marginLeft: "10px" }}>{campaign?.target}</span>
             )}
-            {(campaign?.target == "msps" || campaign?.target == "Edinburgh") && emailing.length == 0 && (
+            {(campaign?.target == "msps" || Parties.includes(target) || campaign?.target == "Edinburgh") && emailing.length == 0 && (
               <div style={{ color: "red", marginLeft: "10px" }}>
                 You need to pick at least one recipient!
               </div>

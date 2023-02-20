@@ -21,6 +21,8 @@ export const CreateEmail = () => {
   const [emailBody, setEmailBody] = useState("");
   const [target, setTarget] = useState("msps");
   const [customTarget, setCustomTarget] = useState("");
+  const [party, setParty] = useState('')
+
   const [link, setLink] = useState("");
 
   const [name, setName] = useState("");
@@ -51,7 +53,7 @@ export const CreateEmail = () => {
   const postLink = async () => {
     const body = {
       name: name.replace(" ", "-"),
-      target: target !== "custom" ? target : customTarget,
+      target: (target == "custom" || target == "party") ? customTarget : target,
       channel: "email",
       hashtag: "none",
       template: emailBody,
@@ -180,8 +182,7 @@ export const CreateEmail = () => {
             marginBottom: "5px",
             marginLeft: "5px",
 
-            width: target == "custom" ? "40px" : "100px",
-            color: target == "custom" ? "transparent" : "black",
+            width: target == "custom" || target == "party" ? "100px" : "100%",
             transition: "0s !important",
 
             "& .MuiInputBase-input": {
@@ -192,6 +193,7 @@ export const CreateEmail = () => {
           }}
         >
           <MenuItem value="msps">MSPs</MenuItem>
+          <MenuItem value="party">MSPs by party</MenuItem>
           <MenuItem value="Edinburgh">Edinburgh City Council</MenuItem>
           <MenuItem value="custom">Custom</MenuItem>
         </Select>
@@ -213,6 +215,33 @@ export const CreateEmail = () => {
             ></TextField>
           </>
         )}
+
+{target == "party" && (<>
+           <Select
+           value={customTarget}
+           className="notFlash"
+           onChange={(e) => setCustomTarget(e.target.value)}
+           sx={{
+             backgroundColor: "white",
+             marginTop: "3px",
+             marginBottom: "5px",
+             marginLeft: "5px",
+ 
+             "& .MuiInputBase-input": {
+               padding: "11.5px",
+               paddingLeft: "10px",
+               paddingRight: "0",
+             },
+           }}
+         >
+           <MenuItem value="SNP">SNP</MenuItem>
+           <MenuItem value="Labour">Labour</MenuItem>
+           <MenuItem value="Green">Green</MenuItem>
+           <MenuItem value="Tory">Tory</MenuItem>
+           <MenuItem value="LibDem">LibDem</MenuItem>
+         </Select></>
+        )}
+
 
         <br />
 
