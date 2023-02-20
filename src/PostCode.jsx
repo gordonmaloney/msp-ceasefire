@@ -26,7 +26,6 @@ export const PostCode = ({ campaign }) => {
     channel: "",
   };
 
-
   const [postcode, setPostcode] = useState(null);
 
   const [gotPostcode, setGotPostcode] = useState(false);
@@ -51,10 +50,11 @@ export const PostCode = ({ campaign }) => {
 
       const data = await response.json();
       const wardData = await wardResponse.json();
-      invalid && setInvalid(false);
-      if (target == "Edinburgh") {wardData.result.admin_district == "City of Edinburgh"
-        ? setWard(wardData.result.admin_ward)
-        : setInvalid(true);}
+      if (target == "Edinburgh") {
+        wardData.result.admin_district == "City of Edinburgh"
+          ? setWard(wardData.result.admin_ward)
+          : setInvalid(true);
+      }
       setConstituency(data.result.scottish_parliamentary_constituency);
     } catch {
       setInvalid(true);
@@ -62,7 +62,10 @@ export const PostCode = ({ campaign }) => {
     }
   };
 
+
+
   useEffect(() => {
+    invalid && setInvalid(false)
     if (constituency) {
       setRegion(
         regions.filter((region) => region.constituency == constituency)[0]
@@ -77,22 +80,25 @@ export const PostCode = ({ campaign }) => {
     }
   }, [ward]);
 
-
-  let Parties = ['SNP', 'Labour', 'Tory', 'LibDem', 'Green']
+  let Parties = ["SNP", "Labour", "Tory", "LibDem", "Green"];
 
   useEffect(() => {
     if (Parties.includes(target)) {
-      setConstMSPs(
-        msps.filter(
-          (msp) => (msp.constituency == constituency || msp.constituency == region)
-        ).filter(msp => msp.party == target)
-      )
-    } else {setConstMSPs(
-      msps.filter(
+      let partyMSPs = msps
+        .filter(
+          (msp) =>
+            msp.constituency == constituency || msp.constituency == region
+        )
+        .filter((msp) => msp.party == target);
+      setConstMSPs(partyMSPs);
+      if (partyMSPs.length == 0) setInvalid(true)
+    } else {
+      let tempConstMSPs = msps.filter(
         (msp) => msp.constituency == constituency || msp.constituency == region
-      )
-    )}
-  }, [region]);
+      );
+      setConstMSPs(tempConstMSPs);
+    }
+  }, [region, constituency]);
 
   //fade in
   const [fade, setFade] = useState("fadeIn");
@@ -101,12 +107,17 @@ export const PostCode = ({ campaign }) => {
   }, []);
 
 
+
   return (
     <>
       <div className={`landing ${fade}`}>
         {invalid ||
+        (region && constMSPs.length == 0) ||
         (!constituency &&
-          (!target || target == "msps" || target == "Edinburgh" || Parties.includes(target))) ? (
+          (!target ||
+            target == "msps" ||
+            target == "Edinburgh" ||
+            Parties.includes(target))) ? (
           <>
             <div className="landingContainerSmall">
               <span className="bebas header header2">
@@ -143,15 +154,18 @@ export const PostCode = ({ campaign }) => {
                   }}
                 />
                 {invalid && (
-                  <h5 style={{marginBottom: '-10px'}}>
+                  <h5 style={{ marginBottom: "-10px" }}>
                     This postcode doesn't seem to be valid!
                     <br />
+                    <br />
                     That might be because this campaign is only targeting people
-                    in a specific area, but if you think that's wrong then try
-                    again.
+                    in a specific area, or because you don't have any
+                    representatives from the party it's targeting. If you think
+                    that's wrong then try again.
                   </h5>
                 )}
-                <br /><br />
+                <br />
+                <br />
                 <Button sx={BtnStyle} onClick={() => fetchPostcodeDeets()}>
                   Draft your {channel == "email" ? "email" : "tweet"}
                 </Button>
