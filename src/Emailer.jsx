@@ -5,7 +5,7 @@ import { Chip, Paper } from "@mui/material";
 import { msps } from "./Data/MSPS";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { Checkbox, FormLabel, Grid, TextField, Button, } from "@mui/material";
+import { Checkbox, FormLabel, Grid, TextField, Button } from "@mui/material";
 import { BtnStyle, CheckBoxStyle, BtnStyleSmall } from "./Shared";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 //accordion imports
@@ -31,7 +31,7 @@ export const Emailer = ({
   setConstituency,
   postcode,
   cllrs,
-  ward
+  ward,
 }) => {
   const [emailing, setEmailing] = useState([]);
   const [notEmailing, setNotEmailing] = useState([]);
@@ -53,7 +53,7 @@ export const Emailer = ({
       setOpen(true);
     }, 1000);
   };
-  let Parties = ['SNP', 'Labour', 'Tory', 'LibDem', 'Green']
+  let Parties = ["SNP", "Labour", "Tory", "LibDem", "Green"];
 
   useEffect(() => {
     if (campaign) {
@@ -68,14 +68,14 @@ export const Emailer = ({
   }, [constMSPs]);
 
   useEffect(() => {
-   target !== "Edinburgh" && setEmailing(constMSPs);
+    target !== "Edinburgh" && setEmailing(constMSPs);
   }, [constMSPs]);
 
   useEffect(() => {
-    target == "Edinburgh" && setEmailing(cllrs)
-  }, [target, ward, cllrs])
+    target == "Edinburgh" && setEmailing(cllrs);
+  }, [target, ward, cllrs]);
 
-  console.log(emailing)
+  console.log(emailing);
 
   const handleOptin = async () => {
     console.log("opting in: ", optIn);
@@ -88,10 +88,7 @@ export const Emailer = ({
       };
       console.log(body);
 
-      const response = await axios.post(
-        OPTIN_API,
-        body
-      );
+      const response = await axios.post(OPTIN_API, body);
       console.log(response);
     } else {
       console.log("not opted in");
@@ -151,14 +148,19 @@ export const Emailer = ({
                 }}
               ></Chip>
             ))}
-            {campaign?.target !== "msps" && campaign?.target !== "Edinburgh" && !Parties.includes(target) && (
-              <span style={{ marginLeft: "10px" }}>{campaign?.target}</span>
-            )}
-            {(campaign?.target == "msps" || Parties.includes(target) || campaign?.target == "Edinburgh") && emailing.length == 0 && (
-              <div style={{ color: "red", marginLeft: "10px" }}>
-                You need to pick at least one recipient!
-              </div>
-            )}
+            {campaign?.target !== "msps" &&
+              campaign?.target !== "Edinburgh" &&
+              !Parties.includes(target) && (
+                <span style={{ marginLeft: "10px" }}>{campaign?.target}</span>
+              )}
+            {(campaign?.target == "msps" ||
+              Parties.includes(target) ||
+              campaign?.target == "Edinburgh") &&
+              emailing.length == 0 && (
+                <div style={{ color: "red", marginLeft: "10px" }}>
+                  You need to pick at least one recipient!
+                </div>
+              )}
           </Paper>
           {notEmailing.length > 0 && (
             <>
@@ -190,7 +192,8 @@ export const Emailer = ({
                         color: "black",
                       }}
                     >
-                      {target == "Edinburgh" ? "Councillors " : "MSPs "}you aren't emailing:
+                      {target == "Edinburgh" ? "Councillors " : "MSPs "}you
+                      aren't emailing:
                     </div>
                   </AccordionSummary>
                   <AccordionDetails
@@ -203,8 +206,10 @@ export const Emailer = ({
                     }}
                   >
                     <div style={{ marginLeft: "5px" }}>
-                      These are the {target == "Edinburgh" ? "councillors " : "MSPs "} not included in your email. If you'd
-                      like to include them, just tap their name.
+                      These are the{" "}
+                      {target == "Edinburgh" ? "councillors " : "MSPs "} not
+                      included in your email. If you'd like to include them,
+                      just tap their name.
                     </div>
                     <br />
                     {notEmailing.map((msp) => (
@@ -327,55 +332,65 @@ export const Emailer = ({
           <Grid container justifyContent="space-around">
             <Grid item xs={12} sm={6}>
               <center>
-              <Button
-                href={`mailto:${
-                  !campaign?.target || campaign?.target == "msps" || campaign?.target == "Edinburgh"
-                    ? emailing.map((msp) => msp.email).join(",")
-                    : campaign?.target
-                }?subject=${subject}&body=${
-                  body.replace(/\n/g, "%0A") +
-                  "%0A%0A" +
-                  signOff.replace(/\n/g, "%0A")
-                }`}
-                //disabled={signOff == "Regards,\n"}
-                size="large"
-                variant="contained"
-                style={{ ...BtnStyleSmall, margin: 2 }}
-                onClick={() => {
-                  openModal();
-                  handleOptin();
-                }}
-              >
-                Send your email
-              </Button>
+                <Button
+                  href={`mailto:${
+                    !campaign?.target ||
+                    campaign?.target == "msps" ||
+                    campaign?.target == "Edinburgh"
+                      ? emailing.map((msp) => msp.email).join(",")
+                      : campaign?.target
+                  }?subject=${subject}&body=${
+                    body.replace("%", "%25").replace(/\n/g, "%0A") +
+                    "%0A%0A" +
+                    signOff.replace(/\n/g, "%0A")
+                  }`}
+                  //disabled={signOff == "Regards,\n"}
+                  size="large"
+                  variant="contained"
+                  style={{ ...BtnStyleSmall, margin: 2 }}
+                  onClick={() => {
+                    openModal();
+                    handleOptin();
+                  }}
+                >
+                  Send your email
+                </Button>
               </center>
             </Grid>
-            <Grid item sx={{display: { xs: 'none', sm: 'block' }}}>
-            <center>
+            <Grid item sx={{ display: { xs: "none", sm: "block" } }}>
+              <center>
+                <Button
+                  //disabled={signOff == "Regards,\n"}
+                  className="hideOnMob"
+                  size="large"
+                  variant="contained"
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${
+                    !campaign?.target ||
+                    campaign?.target == "msps" ||
+                    campaign?.target == "Edinburgh"
+                      ? emailing.map((msp) => msp.email).join(",")
+                      : campaign?.target
+                  }&su=${subject}&body=${
+                    body.replace("%", "%25").replace(/\n/g, "%0A") +
+                    "%0A%0A" +
+                    signOff.replace(/\n/g, "%0A")
+                  }`}
+                  target="_blank"
+                  onClick={() => {
+                    openModal();
+                    handleOptin();
+                  }}
+                  style={{ ...BtnStyleSmall, margin: 2 }}
+                >
+                  Send via Gmail
+                </Button>
+              </center>
+            </Grid>
 
-              <Button
-                //disabled={signOff == "Regards,\n"}
-                className="hideOnMob"
-                size="large"
-                variant="contained"
-                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${
-                  !campaign?.target || campaign?.target == "msps"  || campaign?.target == "Edinburgh"
-                    ? emailing.map((msp) => msp.email).join(",")
-                    : campaign?.target
-                }&su=${subject}&body=${
-                  body.replace(/\n/g, "%0A") +
-                  "%0A%0A" +
-                  signOff.replace(/\n/g, "%0A")
-                }`}
-                target="_blank"
-                onClick={() => {
-                  openModal();
-                  handleOptin();
-                }}
-                style={{ ...BtnStyleSmall, margin: 2 }}
-              >
-                Send via Gmail
-              </Button>
+            <Grid item xs={12}>
+              <center style={{fontSize: 'small', marginTop: '5px', width: '80%', marginLeft: 'auto', marginRight: 'auto'}}>
+                Clicking send will open your email client in a new window, where
+                you will be able to proof-read your email and hit send.
               </center>
             </Grid>
           </Grid>
