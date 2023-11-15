@@ -33,8 +33,9 @@ export const Tweetr = ({
 }) => {
   const params = useParams();
 
-  const hashtag = "#" + (campaign?.hashtag || "RentControlsNow");
-  const template = campaign?.template || "what are you doing for tenants? ";
+  const template =
+    campaign?.template ||
+    "what's happening in Gaza is a genocide. We urgently need a ceasefire and an end to Scottish and UK arms sales to Israel. What are you doing to demand that?";
 
   const [target, setTarget] = useState(campaign?.target);
 
@@ -44,16 +45,13 @@ export const Tweetr = ({
 
   const [targetCllrs, setTargetCllrs] = useState([]);
 
-  let Parties = ['SNP', 'Labour', 'Tory', 'LibDem', 'Green']
+  let Parties = ["SNP", "Labour", "Tory", "LibDem", "Green"];
 
   useEffect(() => {
-
-
     (!target || target == "msps" || Parties.includes(target)) &&
       setMspHandle(handles.filter((hand) => hand.name == msp.name)[0].handle);
 
-
-      (target == "Edinburgh") &&
+    target == "Edinburgh" &&
       setMspHandle(targetCllrs.map((cllr) => cllr.twitter).join(", "));
 
     target &&
@@ -94,14 +92,28 @@ export const Tweetr = ({
     }, 1000);
   };
 
+  const handleSend = () => {
+    const sendLink = `https://twitter.com/intent/tweet?text=${tweetBody
+      .replace("#", "%23")
+      .replace(/\n/g, "%0A")}`;
+
+    const width = 550;
+    const height = 400;
+    const left = window.innerWidth / 2 - width / 2;
+    const top = window.innerHeight / 2 - height / 2;
+
+    const windowFeatures = `width=${width},height=${height},left=${left},top=${top}`;
+
+    window.open(sendLink, "twitter", windowFeatures);
+
+    handleOpen();
+  };
+
   return (
     <div>
-      <span className="bebas header header2">
-        {target == "msps" ? "Tweet your MSP" : "Write your tweet"}
-      </span>
+      <span className="bebas header header2">Tweet your MSP</span>
       {(target == "msps" || !target || Parties.includes(target)) && (
         <>
-          <br />
           <br /> It looks like you live in{" "}
           <b>
             {constituency}, {region}
@@ -177,20 +189,8 @@ export const Tweetr = ({
             multiline
             minRows={3}
             value={tweetBody}
-            inputProps={{ maxLength: 280 - (hashtag.length + 2) }}
+            inputProps={{ maxLength: 280 }}
             onChange={(e) => setTweetBody(e.target.value)}
-            InputProps={{
-              style: {
-                backgroundColor: "white",
-              },
-            }}
-          />
-          <TextField
-            disabled
-            className="notFlash"
-            fullWidth
-            id="hashtag"
-            defaultValue={hashtag}
             InputProps={{
               style: {
                 backgroundColor: "white",
@@ -200,32 +200,19 @@ export const Tweetr = ({
           <div
             style={{
               textAlign: "right",
-              color: `rgb(${255}, ${
-                255 - (tweetBody.length + hashtag.length - 250) * 10
-              }, ${255 - (tweetBody.length + hashtag.length - 250) * 10})`,
+              color: `rgb(${255}, ${255 - tweetBody.length * 10}, ${
+                255 - tweetBody.length * 10
+              })`,
             }}
           >
-            {tweetBody.length + hashtag.length + 2}/280
+            {tweetBody.length}/280
           </div>
         </>
       ) : (
         <>It looks like this MSP isn't on Twitter.</>
       )}
-      <br />
-      <br />
       <center>
-        <Button
-          sx={BtnStyle}
-          target="_blank"
-          href={`https://twitter.com/intent/tweet?text=${(
-            tweetBody +
-            " " +
-            hashtag
-          )
-            .replace("#", "%23")
-            .replace(/\n/g, "%0A")}`}
-          onClick={handleOpen}
-        >
+        <Button sx={BtnStyle} target="_blank" onClick={handleSend}>
           Send Tweet
         </Button>
       </center>
@@ -250,7 +237,7 @@ export const Tweetr = ({
                 Your other MSPs:
               </div>{" "}
             </AccordionSummary>
-            <AccordionDetails sx={{ paddingTop: "-20px", paddingX: "10px" }}>
+            <AccordionDetails sx={{ marginTop: "-30px", paddingX: "10px" }}>
               <p>
                 Each area in Scotland is represented by multiple MSPs. One for
                 the constituency, and several for the list. By default, this
@@ -331,7 +318,7 @@ export const Tweetr = ({
           >
             x
           </span>
-          <ModalContent />
+          <ModalContent setOpen={setOpen} />
         </Box>
       </Modal>
     </div>

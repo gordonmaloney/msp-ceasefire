@@ -21,7 +21,7 @@ export const mobileStyle = {
   paddingBottom: 2,
 };
 
-export const ModalContent = () => {
+export const ModalContent = ({ setOpen }) => {
   //tooltip
   const [tooltipOpen, setTooltipOpen] = useState(false);
   useEffect(() => {
@@ -35,7 +35,7 @@ export const ModalContent = () => {
   return (
     <div>
       <span className="bebas header header2" style={{ color: "black" }}>
-        Build the power
+        Build the campaign
       </span>
 
       <p>
@@ -44,7 +44,15 @@ export const ModalContent = () => {
         <br />
         <br />
         Will you share the campaign link with some friends? The most effective
-        way is to message people directly over WhatsApp or Messenger.
+        way is to message people directly on platforms like WhatsApp or
+        Messenger.
+        <br />
+        <br />
+        Alternatively, you can{" "}
+        <u>
+          <span onClick={() => setOpen(false)}>close this window</span>
+        </u>{" "}
+        and use the tool to message your other MSPs, if you haven't already.
       </p>
 
       <TextField

@@ -2,7 +2,6 @@ import { TextField, Button, FormLabel } from "@mui/material";
 import { useEffect } from "react";
 import { useState } from "react";
 import { Tweetr } from "./Tweetr";
-import { Emailer } from "./Emailer";
 
 import { regions } from "./Data/REGIONS";
 import { msps } from "./Data/MSPS";
@@ -10,16 +9,11 @@ import { handles } from "./Data/HANDLES";
 import { BtnStyle, BtnStyleSmall } from "./Shared";
 import { useParams } from "react-router-dom";
 
-import { EDINBURGHCLLRS } from "./Data/EDINBURGHCLLRS";
 
 export const PostCode = ({ campaign }) => {
   const params = useParams();
-  const [channel, setChannel] = useState("");
 
-  useEffect(() => {
-    if (campaign?.channel) setChannel(campaign.channel);
-    if (params?.channel) setChannel(params.channel);
-  }, [campaign, params]);
+  const channel = "twitter"
 
   const { target, name, hashtag, template, talkingPoints } = campaign || {
     target: "",
@@ -50,11 +44,7 @@ export const PostCode = ({ campaign }) => {
 
       const data = await response.json();
       const wardData = await wardResponse.json();
-      if (target == "Edinburgh") {
-        wardData.result.admin_district == "City of Edinburgh"
-          ? setWard(wardData.result.admin_ward)
-          : setInvalid(true);
-      }
+
       setConstituency(data.result.scottish_parliamentary_constituency);
     } catch {
       setInvalid(true);
@@ -73,12 +63,6 @@ export const PostCode = ({ campaign }) => {
       );
     }
   }, [constituency]);
-
-  useEffect(() => {
-    if (ward) {
-      setCllrs(EDINBURGHCLLRS.filter((cllr) => cllr.ward == ward));
-    }
-  }, [ward]);
 
   let Parties = ["SNP", "Labour", "Tory", "LibDem", "Green"];
 
@@ -116,22 +100,15 @@ export const PostCode = ({ campaign }) => {
         (!constituency &&
           (!target ||
             target == "msps" ||
-            target == "Edinburgh" ||
             Parties.includes(target))) ? (
           <>
             <div className="landingContainerSmall">
               <span className="bebas header header2">
-                {channel == "email"
-                  ? `Email your ${
-                      target !== "Edinburgh" ? "MSP" : "Councillor"
-                    }`
-                  : `Tweet your ${
-                      target !== "Edinburgh" ? "MSP" : "Councillor"
-                    }`}
+                DEMAND YOUR MSP CALLS FOR A CEASEFIRE
               </span>
               <br />
-              <br />
               <center>
+                <p>Use this tool to message your MSPs on Twitter/X and demand they back a ceasefire in Gaza, and an end to UK and Scottish arms sales to Israel.</p>
                 <FormLabel sx={{ color: "white" }}>
                   Enter your postcode to begin:
                 </FormLabel>
@@ -167,7 +144,7 @@ export const PostCode = ({ campaign }) => {
                 <br />
                 <br />
                 <Button sx={BtnStyle} onClick={() => fetchPostcodeDeets()}>
-                  Draft your {channel == "email" ? "email" : "tweet"}
+                  Send your {channel == "email" ? "email" : "tweet"}
                 </Button>
               </center>
             </div>
@@ -175,7 +152,7 @@ export const PostCode = ({ campaign }) => {
         ) : (
           <>
             <div className="landingContainer">
-              {channel == "tweet" ? (
+              {channel == "twitter" ? (
                 <Tweetr
                   campaign={campaign}
                   constituency={constituency}
@@ -188,21 +165,7 @@ export const PostCode = ({ campaign }) => {
                     msps.filter((msp) => msp.constituency == constituency)[0]
                   }
                 />
-              ) : (
-                <Emailer
-                  postcode={postcode}
-                  campaign={campaign}
-                  constituency={constituency}
-                  region={region}
-                  ward={ward}
-                  cllrs={cllrs}
-                  setConstituency={() => setConstituency(null)}
-                  constMSPs={constMSPs}
-                  mspProp={
-                    msps.filter((msp) => msp.constituency == constituency)[0]
-                  }
-                />
-              )}
+              ) : <></>}
             </div>
           </>
         )}
